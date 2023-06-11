@@ -1,0 +1,29 @@
+/*
+ * config.h
+ *
+ *  Created on: 5 jul. 2022
+ *      Author: Damian
+ */
+
+#ifndef CONFIG_H
+#define CONFIG_H
+
+//url del endpoint que recibe los datos de telemetría
+#define DATA_ENDPOINT "http://mi.api:3000/data"
+//url del endpoint que devuelve el siguiente comando a ejecutar
+#define COMMANDS_ENPOINT "http://mi.api:3000/commands"
+
+typedef struct
+{
+	char wifiSSID[50];
+	char wifiPass[50];
+
+}project_config_t;
+
+extern project_config_t projectConfig;
+
+void configInit(void);
+
+
+
+#endif /*CONFIG_H */

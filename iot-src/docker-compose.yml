@@ -40,6 +40,18 @@ services:
       -               app-fullstack-net 
       stdin_open: true
       tty: true
+  
+  node-backend:
+    image:                   abassi/nodejs-server:10.0-dev
+    volumes:
+      -                    ./node:/home/node/app/src
+    networks:
+      -                    app-fullstack-net
+    depends_on:
+      -                    mysqldb
+    ports: 
+      -                    "8000:3000"
+    command:                 nodemon /home/node/app/src/index.js
 
 networks:
     app-fullstack-net:
