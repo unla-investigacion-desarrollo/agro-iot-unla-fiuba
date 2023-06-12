@@ -42,16 +42,31 @@ services:
       tty: true
   
   node-backend:
-    image:                   abassi/nodejs-server:10.0-dev
+    image:            abassi/nodejs-server:10.0-dev
     volumes:
-      -                    ./node:/home/node/app/src
+      -               ./node:/home/node/app/src
     networks:
-      -                    app-fullstack-net
+      -               app-fullstack-net
     depends_on:
-      -                    mysqldb
+      -               mysqldb
     ports: 
-      -                    "8000:3000"
-    command:                 nodemon /home/node/app/src/index.js
+      -               "8000:3000"
+    command:          nodemon /home/node/app/src/index.js
+
+  react-frontend:
+    depends_on:
+      -               node-backend
+    build:
+      context:        ./react
+    ports:
+      -               "3000:3000"
+    container_name:   react-frontend
+    stdin_open:       true
+    volumes:
+       -              ./react:/usr/src/app/react
+       -              /usr/src/app/react/node_modules
+    networks:
+      -               app-fullstack-net 
 
 networks:
     app-fullstack-net:

@@ -1,0 +1,117 @@
+@import '~antd/dist/antd.css';
+
+.header {
+    background: #81be54;
+    height: auto;
+    box-shadow: 0 3px 6px rgb(0 0 0 / 16%),
+        0 3px 6px rgb(0 0 0 / 23%);
+}
+
+@media (max-width: 425px) {
+    .header {
+        padding: 0px 15px !important;
+    }
+}
+
+.header-menu {
+    justify-content: center;
+    background-color: transparent;
+    border-bottom: none;
+}
+
+.header-menu .ant-menu-item,
+.header-menu .ant-menu-submenu {
+    text-transform: uppercase;
+    font-weight: 700;
+    color: rgba(0, 0, 0, .65);
+}
+
+
+.header-menu .ant-menu-item:hover,
+.header-menu .ant-menu-item-selected,
+.header-menu .ant-menu-submenu-title:hover,
+.header-menu .ant-menu-submenu-selected,
+.header-menu .ant-menu-submenu-active {
+    color: #CB1AF7 !important;
+}
+
+.header-avatar {
+    background-color: rgba(0, 0, 0, .65);
+    cursor: 'pointer';
+}
+
+.logo {
+    color: white;
+    font-size: 1.3rem;
+    padding: 0 1rem 0 0;
+}
+
+.ant-layout-content {
+    padding-top: 2.5rem;
+}
+
+.container {
+    width: 100%;
+    padding: 0 10px;
+    margin: 0 auto;
+}
+
+@media (min-width: 1600px) {
+    .container {
+        max-width: 1440px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1300px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding: 0 40px;
+    }
+}
+
+@media (min-width: 576px) {
+    .container {
+        padding: 0 30px;
+    }
+}
+
+@media (min-width: 480px) {
+    .container {
+        padding: 0 20px;
+    }
+}
+
+.login-background-image {
+    background-image: url('../assets/login-background.jpg');
+    background-size: cover;
+    height: 100%;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+}
+
+.loading-app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.ant-card-meta-title,
+.antd-card-no-ellipsis-title {
+    white-space: pre-line;
+
+}
