@@ -1,0 +1,21 @@
+#include "config.h"
+#include <string.h>
+project_config_t projectConfig;
+
+
+/*
+En una siguiente iteración del proyecto, estos valores deberían
+ser grabados en memoria en un "modo de configuración" y luego
+recuperados en esta función. Por esta razón no están declarados
+usando #define o un array constante
+
+*/
+
+
+void configInit(void)
+{
+	strcpy(projectConfig.wifiSSID,"miRedWifi");  //nombre de la red a la que se conectara el dispositivo     
+	strcpy(projectConfig.wifiPass,"miPassword"); //password de la red a la que se conectara el dispositivo  
+}
+
+

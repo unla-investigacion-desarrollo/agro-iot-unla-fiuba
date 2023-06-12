@@ -3,10 +3,10 @@
 var mysql = require('mysql');
 
 var connection = mysql.createConnection({
-    host     : 'mysql-server',
+    host     : 'mysqldb',
     port     : '3306',
     user     : 'root',
-    password : 'userpass',
+    password : 'root12345678',
     database : 'agro_iot'
 });
 
