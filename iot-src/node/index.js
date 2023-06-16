@@ -17,14 +17,21 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
   console.log("Topic: " + topic.toString());
-  console.log("Message: " + message.toString());
+  const objResponse = JSON.parse(message.toString());
+  console.log("Temperatura ambiente: " + objResponse.ta);
+  console.log("Humedad relativa: " + objResponse.hr);
+
+  /*utils.query('INSERT INTO `metric_reading` (`reading_date`, `value`, `value_type`, `metric_type_id`, `sector_id`) VALUES (?,?,?,?,?)',
+      ["2020-10-10", 20, "porcentaje", "hum", 1],
+      function(err, rta, field) {
+          if (err) {
+              return;
+          }
+      }
+  );*/
 })
 
 app.use(express.json());
-
-app.get('/hello/', function(req, res, next) {
-    res.send(JSON.stringify("hola gus")).status(200);
-});
 
 app.listen(PORT, function(req, res) {
     console.log("NodeJS API running correctly");

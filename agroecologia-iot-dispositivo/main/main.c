@@ -33,13 +33,12 @@ void app_main(void)
 	timedOutputsInit();
 	timedOutputsAdd(2);
 
-    printf("-------------------------TEST PIN\n");
     dht22_t * pDht22=dht22Init(15);
 	vTaskDelay(5000 / portTICK_PERIOD_MS); // dht22 necsita un tiempo para estabilizarse
 
     dataTransmitterInit();
-    dataTransmitterRegisterSensor("temperaturaAmbiente", pDht22, dht22GenericReadTemp);
-    dataTransmitterRegisterSensor("humedadRelativa", pDht22, dht22GenericReadRH);
+    dataTransmitterRegisterSensor("ta", pDht22, dht22GenericReadTemp);
+    dataTransmitterRegisterSensor("hr", pDht22, dht22GenericReadRH);
 
     dataTransmitterPrintStart();
 }

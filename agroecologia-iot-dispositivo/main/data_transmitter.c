@@ -66,8 +66,6 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     switch ((esp_mqtt_event_id_t)event_id) {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-        msg_id = esp_mqtt_client_publish(client, "/metrics/hello", "hello from 123", 0, 1, 0);
-        ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
@@ -238,46 +236,8 @@ void appendToTxBuffer(char * txBuffer, char *name, char *value)
 	sprintf(&txBuffer[len],"\"%s\":%s,",name,value);
 }
 
-/*void dataTransmitterTask(void * parameter)
-{
-	char * txBuffer = malloc(TX_BUFF_SIZE);
-	while(1)
-	{
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-		wifi_wait_connected();
-		strcpy(txBuffer,"{");
-		for(int i=0;i<MAX_SENSORS;i++)
-		{
-			if(registeredSensors[i].sensorRead != NULL)
-			{
-				char value[100];
-				registeredSensors[i].sensorRead( registeredSensors[i].pSensorTda,value,100);
-				appendToTxBuffer(txBuffer, registeredSensors[i].name, value);
-			}
-		}
-		txBuffer[strlen(txBuffer) -1] = '}'; //cambiamos la , por }
-        esp_http_client_config_t config = {
-            .url = DATA_ENDPOINT,
-        };
-        esp_http_client_handle_t client = esp_http_client_init(&config);
-	    esp_http_client_set_method(client, HTTP_METHOD_POST);
-	    esp_http_client_set_header(client, "Content-Type", "application/json");
-	    esp_http_client_set_post_field(client, txBuffer, strlen(txBuffer));
-	    esp_http_client_perform(client);
-	    esp_http_client_cleanup(client);
-	    printf("%s\n",txBuffer);
-	}
-}
-
-void dataTransmitterStart(void)
-{
-	xTaskCreate(dataTransmitterTask,"dataTxTask", 10000, NULL, 1, NULL);
-}*/
-
 void dataTransmitterPrintTask(void * parameter)
 {
-	
-  printf("-------------------------TEST PRINT\n");
 	char * txBuffer = malloc(TX_BUFF_SIZE);
 	while(1)
 	{
