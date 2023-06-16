@@ -7,6 +7,17 @@ var utils   = require('./mysql-connector');
 const mqtt = require('mqtt')
 const client  = mqtt.connect('mqtt://192.168.0.2')
 
+function insertMetric(value, metricType, sector) {
+  utils.query('INSERT INTO `metric_reading` (`reading_date`, `value`, `value_type`, `metric_type_id`, `sector_id`) VALUES (?,?,?,?,?)',
+    [new Date(), value, "porcentaje", metricType, sector],
+    function(err, rta, field) {
+      if (err) {
+        return;
+      }
+    }
+  );
+}
+
 client.on('connect', function () {
   client.subscribe('/metrics/#', function (err) {
     if (!err) {
@@ -20,36 +31,15 @@ client.on('message', function (topic, message) {
   const objResponse = JSON.parse(message.toString());
   if(objResponse.hasOwnProperty('ta')){
     console.log("Temperatura ambiente: " + objResponse.ta);
-    utils.query('INSERT INTO `metric_reading` (`reading_date`, `value`, `value_type`, `metric_type_id`, `sector_id`) VALUES (?,?,?,?,?)',
-      ["2020-10-10", objResponse.ta, "porcentaje", "ta", 1],
-      function(err, rta, field) {
-        if (err) {
-          return;
-        }
-      }
-    );
+    insertMetric(objResponse.ta, 'ta', 1);
   }
   if(objResponse.hasOwnProperty('hr')){
     console.log("Temperatura ambiente: " + objResponse.hr);
-    utils.query('INSERT INTO `metric_reading` (`reading_date`, `value`, `value_type`, `metric_type_id`, `sector_id`) VALUES (?,?,?,?,?)',
-      ["2020-10-10", objResponse.hr, "porcentaje", "hr", 1],
-      function(err, rta, field) {
-        if (err) {
-          return;
-        }
-      }
-    );
+    insertMetric(objResponse.hr, 'hr', 1);
   }
   if(objResponse.hasOwnProperty('hs')){
     console.log("Temperatura ambiente: " + objResponse.hs);
-    utils.query('INSERT INTO `metric_reading` (`reading_date`, `value`, `value_type`, `metric_type_id`, `sector_id`) VALUES (?,?,?,?,?)',
-      ["2020-10-10", objResponse.hs, "porcentaje", "hs", 1],
-      function(err, rta, field) {
-        if (err) {
-          return;
-        }
-      }
-    );
+    insertMetric(objResponse.hs, 'hs', 1);
   }
 })
 
