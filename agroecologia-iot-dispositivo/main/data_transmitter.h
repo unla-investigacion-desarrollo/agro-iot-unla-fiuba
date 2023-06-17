@@ -3,7 +3,6 @@
 
 void dataTransmitterInit(void);
 int dataTransmitterRegisterSensor(char * name, void * pSensorTda, void (*sensorRead)(void *,char *, int));
-void dataTransmitterStart(void);
 void dataTransmitterPrintStart(void);
 
 #endif

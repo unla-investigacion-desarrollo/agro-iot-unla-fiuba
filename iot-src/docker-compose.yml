@@ -32,8 +32,7 @@ services:
           "spring.datasource.password" : "$MYSQLDB_ROOT_PASSWORD",
           "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5Dialect",
           "logging.level.org.hibernate.sql" : "debug",
-          "spring.datasource.driver-class-name": "com.mysql.cj.jdbc.Driver",
-          "spring.jpa.hibernate.ddl-auto" : "update"}'
+          "spring.datasource.driver-class-name": "com.mysql.cj.jdbc.Driver"}'
       volumes:
         -             ./spring-agroecologia-iot/logs:/app/logs
       networks:
