@@ -16,7 +16,6 @@
 #include "timed_outputs.h"
 #include "config.h"
 #include "wifi.h"
-#include "command_processor.h"
 
 void app_main(void)
 {

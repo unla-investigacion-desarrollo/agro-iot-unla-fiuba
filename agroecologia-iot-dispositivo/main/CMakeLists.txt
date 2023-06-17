@@ -5,7 +5,6 @@ idf_component_register(SRCS "main.c"
 							 "timed_outputs.c"
 							 "wifi.c"
 							 "config.c"
-							 "command_processor.c"
 							 "data_transmitter.c" 
 							 "sensors/mock/mock_sensor.c"
                     INCLUDE_DIRS "")

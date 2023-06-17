@@ -28,20 +28,32 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
   console.log("Topic: " + topic.toString());
-  const objResponse = JSON.parse(message.toString());
-  if(objResponse.hasOwnProperty('ta')){
-    console.log("Temperatura ambiente: " + objResponse.ta);
-    insertMetric(objResponse.ta, 'ta', 1);
-  }
-  if(objResponse.hasOwnProperty('hr')){
-    console.log("Temperatura ambiente: " + objResponse.hr);
-    insertMetric(objResponse.hr, 'hr', 1);
-  }
-  if(objResponse.hasOwnProperty('hs')){
-    console.log("Temperatura ambiente: " + objResponse.hs);
-    insertMetric(objResponse.hs, 'hs', 1);
+  if(isJson(message.toString())) {
+    const objResponse = JSON.parse(message.toString());
+    if(objResponse.hasOwnProperty('ta')){
+      console.log("Temperatura ambiente: " + objResponse.ta);
+      insertMetric(objResponse.ta, 'ta', 1);
+    }
+    if(objResponse.hasOwnProperty('hr')){
+      console.log("Temperatura ambiente: " + objResponse.hr);
+      insertMetric(objResponse.hr, 'hr', 1);
+    }
+    if(objResponse.hasOwnProperty('hs')){
+      console.log("Temperatura ambiente: " + objResponse.hs);
+      insertMetric(objResponse.hs, 'hs', 1);
+    }
   }
 })
+
+function isJson(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    console.log("is not a Json value");
+    return false;
+  }
+  return true;
+}
 
 app.use(express.json());
 
