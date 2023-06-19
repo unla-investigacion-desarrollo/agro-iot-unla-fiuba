@@ -24,15 +24,14 @@
 static const char *TAG = "MQTT_EXAMPLE";
 
 // Set your local broker URI
-#define BROKER_URI "mqtt://192.168.0.2:1883" //daiot.com.ar
+#define BROKER_URI projectConfig.brockerUri
 
-#define MOSQUITO_USER_NAME              ""
-#define MOSQUITO_USER_PASSWORD          ""
+#define MOSQUITO_USER_NAME              projectConfig.mosquittoUserName
+#define MOSQUITO_USER_PASSWORD          projectConfig.mosquittoUserPassword
 
 #define MAX_SENSORS 30
 #define TX_BUFF_SIZE (1024*16) //16k just in case
 
-static bool mqtt_connected = false;
 static esp_mqtt_client_handle_t global_client;
 
 static void log_error_if_nonzero(const char *message, int error_code)
@@ -52,12 +51,12 @@ static void log_error_if_nonzero(const char *message, int error_code)
  * @param event_id The id for the received event.
  * @param event_data The data for the event, esp_mqtt_event_handle_t.
  */
-static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
+//is not used by now
+/*static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
     ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     esp_mqtt_event_handle_t event = event_data;
     esp_mqtt_client_handle_t client = event->client;
-    int msg_id;
     switch ((esp_mqtt_event_id_t)event_id) {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
@@ -78,7 +77,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         ESP_LOGI(TAG, "Other event id:%d", event->event_id);
         break;
     }
-}
+}*/
 
 static void mqtt_app_send_metric(char * metric)
 {
@@ -86,15 +85,14 @@ static void mqtt_app_send_metric(char * metric)
     ESP_LOGI(TAG, "Publish");
     msg_id = esp_mqtt_client_publish(global_client, "/metrics/123", metric, 0, 1, 0);
     ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
-    //esp_mqtt_client_start(client);
 }
 
 static void mqtt_app_start()
 {
     esp_mqtt_client_config_t mqtt_cfg = {
         .uri = BROKER_URI,
-        //.username = MOSQUITO_USER_NAME,
-        //.password = MOSQUITO_USER_PASSWORD,
+        .username = MOSQUITO_USER_NAME,
+        .password = MOSQUITO_USER_PASSWORD,
     };
     #if CONFIG_BROKER_URL_FROM_STDIN
         char line[128];
@@ -122,8 +120,6 @@ static void mqtt_app_start()
     #endif /* CONFIG_BROKER_URL_FROM_STDIN */
 
     global_client = esp_mqtt_client_init(&mqtt_cfg);
-    /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
-    //esp_mqtt_client_register_event(global_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
     esp_mqtt_client_start(global_client);
 }
 
@@ -203,11 +199,6 @@ void dataTransmitterPrintStart(void)
     ESP_ERROR_CHECK(esp_netif_init());
     //ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-     * Read "Establishing Wi-Fi or Ethernet Connection" section in
-     * examples/protocols/README.md for more information about this function.
-     */
-    //ESP_ERROR_CHECK(example_connect());
     mqtt_app_start();
 	xTaskCreate(dataTransmitterPrintTask,"dataTxTask", 10000, NULL, 1, NULL);
 }
