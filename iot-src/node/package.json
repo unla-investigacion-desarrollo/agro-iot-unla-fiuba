@@ -9,6 +9,7 @@
   "author": "Gustavo Hernan Siciliano",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "express": "^4.17.1",
     "mqtt": "^4.3.7",
     "mysql": "^2.18.1"

@@ -44,6 +44,7 @@ services:
     image:            abassi/nodejs-server:10.0-dev
     volumes:
       -               ./node:/home/node/app/src
+    env_file:         ./.env
     networks:
       -               app-fullstack-net
     depends_on:

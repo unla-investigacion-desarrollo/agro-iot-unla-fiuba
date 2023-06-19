@@ -91,3 +91,4 @@ backup
 
 # Backend Spring
 iot-src/db/data
+.vscode

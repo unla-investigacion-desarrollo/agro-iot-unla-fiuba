@@ -1,15 +1,25 @@
 var PORT    = 3000;
 
 var express = require('express');
+require('dotenv').config();
 var app     = express();
 var utils   = require('./mysql-connector');
 
 const mqtt = require('mqtt')
-const client  = mqtt.connect('mqtt://192.168.0.2')
+var options = {
+                clientId: process.env.NODE_MQTT_CLIENT_ID,
+                username: process.env.NODE_MQTT_USER,
+                password: process.env.NODE_MQTT_PASS,
+                clean: true
+              };
+const client  = mqtt.connect(process.env.NODE_MQTT_SERVER, options)
 
 function insertMetric(value, metricType, sector) {
+  toDay = new Date();
+  toDayFormat = toDay.toLocaleString("es-ARG", {timeZone: "America/Argentina/Buenos_Aires"});
+  toDayGMT = new Date(toDayFormat);
   utils.query('INSERT INTO `metric_reading` (`reading_date`, `value`, `value_type`, `metric_type_id`, `sector_id`) VALUES (?,?,?,?,?)',
-    [new Date(), value, "porcentaje", metricType, sector],
+    [toDayGMT, value, "porcentaje", metricType, sector],
     function(err, rta, field) {
       if (err) {
         return;

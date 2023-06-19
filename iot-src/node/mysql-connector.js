@@ -1,13 +1,13 @@
 //=======[ Settings, Imports & Data ]==========================================
 
 var mysql = require('mysql');
-
+require('dotenv').config();
 var connection = mysql.createConnection({
-    host     : 'mysqldb',
-    port     : '3306',
-    user     : 'root',
-    password : 'root12345678',
-    database : 'agro_iot'
+    host     : process.env.NODE_DB_HOST,
+    port     : process.env.NODE_DB_PORT,
+    user     : process.env.NODE_DB_USER,
+    password : process.env.NODE_DB_PASS,
+    database : process.env.NODE_DB_DATABASE
 });
 
 //=======[ Main module code ]==================================================
