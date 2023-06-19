@@ -15,8 +15,11 @@ var options = {
 const client  = mqtt.connect(process.env.NODE_MQTT_SERVER, options)
 
 function insertMetric(value, metricType, sector) {
+  toDay = new Date();
+  toDayFormat = toDay.toLocaleString("es-ARG", {timeZone: "America/Argentina/Buenos_Aires"});
+  toDayGMT = new Date(toDayFormat);
   utils.query('INSERT INTO `metric_reading` (`reading_date`, `value`, `value_type`, `metric_type_id`, `sector_id`) VALUES (?,?,?,?,?)',
-    [new Date(), value, "porcentaje", metricType, sector],
+    [toDayGMT, value, "porcentaje", metricType, sector],
     function(err, rta, field) {
       if (err) {
         return;
