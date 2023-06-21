@@ -7,6 +7,8 @@
 
 typedef struct
 {
+	char urlPublish_example[50];
+	char urlSubscription_example[50];
 	char wifiSSID_example[50];
 	char wifiPass_example[50];
 	char brockerUri_example[50];

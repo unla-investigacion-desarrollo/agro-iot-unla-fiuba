@@ -1,4 +1,4 @@
-idf_component_register(SRCS "main.c" 
+idf_component_register(SRCS "config_example.c" "main.c" 
 							 "adc/ads1115/ads1115.c"
 							 "sensors/dht22/dht22.c"
 							 "sensors/soil_moisture/soil_moisture.c"
