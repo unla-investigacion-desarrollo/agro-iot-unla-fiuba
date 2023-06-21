@@ -39,5 +39,5 @@ void app_main(void)
     dataTransmitterRegisterSensor("ta", pDht22, dht22GenericReadTemp);
     dataTransmitterRegisterSensor("hr", pDht22, dht22GenericReadRH);
 
-    dataTransmitterPrintStart();
+    dataTransmitterStart();
 }

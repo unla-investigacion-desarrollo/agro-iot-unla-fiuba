@@ -4,6 +4,8 @@ project_config_t_example projectConfig;
 
 void configInit_example(void)
 {
+	strcpy(projectConfig.urlPublish_example,"/metrics/YOUR_ID_DECIVE");
+	strcpy(projectConfig.urlSubscription_example,"/commands/YOUR_ID_DECIVE/*");
 	strcpy(projectConfig.wifiSSID_example,"Your wifi SSID");
 	strcpy(projectConfig.wifiPass_example,"Your wifi pass");
 	strcpy(projectConfig.brockerUri_example,"Your Mosquitto Brocker uri");

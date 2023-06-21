@@ -20,15 +20,16 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 
-//MQTT
-static const char *TAG = "MQTT_EXAMPLE";
+static const char *TAG = "MQTT_TRANSMITTER";
 
 // Set your local broker URI
-#define BROKER_URI projectConfig.brockerUri
-
+#define BROKER_URI                      projectConfig.brockerUri
 #define MOSQUITO_USER_NAME              projectConfig.mosquittoUserName
 #define MOSQUITO_USER_PASSWORD          projectConfig.mosquittoUserPassword
+#define MOSQUITO_URL_METRIC_PUBLISH     projectConfig.urlPublish
+#define MOSQUITO_URL_SUBSCIPTION        projectConfig.urlSubscription
 
+#define MILISECONDS_PER_TRANSFER 30000
 #define MAX_SENSORS 30
 #define TX_BUFF_SIZE (1024*16) //16k just in case
 
@@ -51,18 +52,30 @@ static void log_error_if_nonzero(const char *message, int error_code)
  * @param event_id The id for the received event.
  * @param event_data The data for the event, esp_mqtt_event_handle_t.
  */
-//is not used by now
-/*static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
+static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
     ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     esp_mqtt_event_handle_t event = event_data;
-    esp_mqtt_client_handle_t client = event->client;
     switch ((esp_mqtt_event_id_t)event_id) {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
+        esp_mqtt_client_subscribe(global_client, MOSQUITO_URL_SUBSCIPTION, 1);
+        break;
+    case MQTT_EVENT_SUBSCRIBED:
+        ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
+        break;
+    case MQTT_EVENT_DATA:
+        ESP_LOGI(TAG, "MQTT_EVENT_DATA");
+        printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
+        char responseData = event->data[0];
+        printf("%c", responseData);
+        char validationResponseData = '1';
+        if(responseData == validationResponseData){
+            esp_mqtt_client_publish(global_client, "/topic/test", "prender", 0, 1, 0);
+        }
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -77,13 +90,13 @@ static void log_error_if_nonzero(const char *message, int error_code)
         ESP_LOGI(TAG, "Other event id:%d", event->event_id);
         break;
     }
-}*/
+}
 
 static void mqtt_app_send_metric(char * metric)
 {
     int msg_id;
     ESP_LOGI(TAG, "Publish");
-    msg_id = esp_mqtt_client_publish(global_client, "/metrics/123", metric, 0, 1, 0);
+    msg_id = esp_mqtt_client_publish(global_client, MOSQUITO_URL_METRIC_PUBLISH, metric, 0, 1, 0);
     ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
 }
 
@@ -118,8 +131,9 @@ static void mqtt_app_start()
             abort();
         }
     #endif /* CONFIG_BROKER_URL_FROM_STDIN */
-
     global_client = esp_mqtt_client_init(&mqtt_cfg);
+    /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
+    esp_mqtt_client_register_event(global_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
     esp_mqtt_client_start(global_client);
 }
 
@@ -157,12 +171,12 @@ void appendToTxBuffer(char * txBuffer, char *name, char *value)
 	sprintf(&txBuffer[len],"\"%s\":%s,",name,value);
 }
 
-void dataTransmitterPrintTask(void * parameter)
+void dataTransmitterTask(void * parameter)
 {
 	char * txBuffer = malloc(TX_BUFF_SIZE);
 	while(1)
 	{
-		vTaskDelay(15000 / portTICK_PERIOD_MS);
+		vTaskDelay(MILISECONDS_PER_TRANSFER / portTICK_PERIOD_MS);
         wifi_wait_connected();
         strcpy(txBuffer,"{");
 		for(int i=0;i<MAX_SENSORS;i++)
@@ -174,14 +188,14 @@ void dataTransmitterPrintTask(void * parameter)
 				appendToTxBuffer(txBuffer, registeredSensors[i].name, value);
 			}
 		}
-		txBuffer[strlen(txBuffer) -1] = '}'; //cambiamos la , por }
+		txBuffer[strlen(txBuffer) -1] = '}'; //changing , for }
 		printf("---Temperature is:");
 		printf(txBuffer);
         mqtt_app_send_metric(txBuffer);
 	}
 }
 
-void dataTransmitterPrintStart(void)
+void dataTransmitterStart(void)
 {
     ESP_LOGI(TAG, "[APP] Startup..");
     ESP_LOGI(TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
@@ -189,7 +203,7 @@ void dataTransmitterPrintStart(void)
 
     esp_log_level_set("*", ESP_LOG_INFO);
     esp_log_level_set("MQTT_CLIENT", ESP_LOG_VERBOSE);
-    esp_log_level_set("MQTT_EXAMPLE", ESP_LOG_VERBOSE);
+    esp_log_level_set("MQTT", ESP_LOG_VERBOSE);
     esp_log_level_set("TRANSPORT_BASE", ESP_LOG_VERBOSE);
     esp_log_level_set("esp-tls", ESP_LOG_VERBOSE);
     esp_log_level_set("TRANSPORT", ESP_LOG_VERBOSE);
@@ -197,8 +211,7 @@ void dataTransmitterPrintStart(void)
 
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
-    //ESP_ERROR_CHECK(esp_event_loop_create_default());
 
     mqtt_app_start();
-	xTaskCreate(dataTransmitterPrintTask,"dataTxTask", 10000, NULL, 1, NULL);
+	xTaskCreate(dataTransmitterTask,"dataTxTask", 10000, NULL, 1, NULL);
 }
