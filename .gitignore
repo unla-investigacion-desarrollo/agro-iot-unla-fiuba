@@ -1,3 +1,7 @@
+.idea
+agroecologia-iot-dispositivo/cmake-build-debug
+agroecologia-iot-dispositivo/.idea
+
 # Logs
 logs
 *.log

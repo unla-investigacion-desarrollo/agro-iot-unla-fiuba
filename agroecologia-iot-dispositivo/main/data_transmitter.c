@@ -1,24 +1,19 @@
 #include "data_transmitter.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_http_client.h"
 #include "wifi.h"
 #include <stdio.h>
 #include <string.h>
 #include "config.h"
-#include <stdint.h>
 #include <stddef.h>
 #include "esp_system.h"
 #include "nvs_flash.h"
-#include "esp_event.h"
 #include "esp_netif.h"
-#include "freertos/semphr.h"
-#include "freertos/queue.h"
-#include "lwip/sockets.h"
-#include "lwip/dns.h"
-#include "lwip/netdb.h"
 #include "esp_log.h"
 #include "mqtt_client.h"
+
+#include <cJSON.h>
+#include <driver/gpio.h>
 
 static const char *TAG = "MQTT_TRANSMITTER";
 
@@ -57,38 +52,40 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     esp_mqtt_event_handle_t event = event_data;
     switch ((esp_mqtt_event_id_t)event_id) {
-    case MQTT_EVENT_CONNECTED:
-        ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-        esp_mqtt_client_subscribe(global_client, MOSQUITO_URL_SUBSCIPTION, 1);
-        break;
-    case MQTT_EVENT_SUBSCRIBED:
-        ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-        break;
-    case MQTT_EVENT_DISCONNECTED:
-        ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
-        break;
-    case MQTT_EVENT_DATA:
-        ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-        printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
-        char responseData = event->data[0];
-        printf("%c", responseData);
-        char validationResponseData = '1';
-        if(responseData == validationResponseData){
-            esp_mqtt_client_publish(global_client, "/topic/test", "prender", 0, 1, 0);
-        }
-        break;
-    case MQTT_EVENT_ERROR:
-        ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
-        if (event->error_handle->error_type == MQTT_ERROR_TYPE_TCP_TRANSPORT) {
-            log_error_if_nonzero("reported from esp-tls", event->error_handle->esp_tls_last_esp_err);
-            log_error_if_nonzero("reported from tls stack", event->error_handle->esp_tls_stack_err);
-            log_error_if_nonzero("captured as transport's socket errno",  event->error_handle->esp_transport_sock_errno);
-            ESP_LOGI(TAG, "Last errno string (%s)", strerror(event->error_handle->esp_transport_sock_errno));
-        }
-        break;
-    default:
-        ESP_LOGI(TAG, "Other event id:%d", event->event_id);
-        break;
+        case MQTT_EVENT_CONNECTED:
+            ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
+            esp_mqtt_client_subscribe(global_client, MOSQUITO_URL_SUBSCIPTION, 1);
+            break;
+        case MQTT_EVENT_SUBSCRIBED:
+            ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
+            break;
+        case MQTT_EVENT_DISCONNECTED:
+            ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
+            break;
+        case MQTT_EVENT_DATA:
+            ESP_LOGI(TAG, "MQTT_EVENT_DATA");
+            printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
+            /*char responseData = event->data[0];
+            printf("%c", responseData);
+            printf("%s", event->data);
+            char validationResponseData = '1';
+            if(responseData == validationResponseData){
+                esp_mqtt_client_publish(global_client, "/topic/test", "prender", 0, 1, 0);
+            }*/
+            jsonHandler(event->data);
+            break;
+        case MQTT_EVENT_ERROR:
+            ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
+            if (event->error_handle->error_type == MQTT_ERROR_TYPE_TCP_TRANSPORT) {
+                log_error_if_nonzero("reported from esp-tls", event->error_handle->esp_tls_last_esp_err);
+                log_error_if_nonzero("reported from tls stack", event->error_handle->esp_tls_stack_err);
+                log_error_if_nonzero("captured as transport's socket errno",  event->error_handle->esp_transport_sock_errno);
+                ESP_LOGI(TAG, "Last errno string (%s)", strerror(event->error_handle->esp_transport_sock_errno));
+            }
+            break;
+        default:
+            ESP_LOGI(TAG, "Other event id:%d", event->event_id);
+            break;
     }
 }
 
@@ -103,12 +100,12 @@ static void mqtt_app_send_metric(char * metric)
 static void mqtt_app_start()
 {
     esp_mqtt_client_config_t mqtt_cfg = {
-        .uri = BROKER_URI,
-        .username = MOSQUITO_USER_NAME,
-        .password = MOSQUITO_USER_PASSWORD,
+            .uri = BROKER_URI,
+            .username = MOSQUITO_USER_NAME,
+            .password = MOSQUITO_USER_PASSWORD,
     };
-    #if CONFIG_BROKER_URL_FROM_STDIN
-        char line[128];
+#if CONFIG_BROKER_URL_FROM_STDIN
+    char line[128];
 
         if (strcmp(mqtt_cfg.uri, "FROM_STDIN") == 0) {
             int count = 0;
@@ -130,7 +127,7 @@ static void mqtt_app_start()
             ESP_LOGE(TAG, "Configuration mismatch: wrong broker url");
             abort();
         }
-    #endif /* CONFIG_BROKER_URL_FROM_STDIN */
+#endif /* CONFIG_BROKER_URL_FROM_STDIN */
     global_client = esp_mqtt_client_init(&mqtt_cfg);
     /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
     esp_mqtt_client_register_event(global_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
@@ -139,60 +136,60 @@ static void mqtt_app_start()
 
 struct
 {
-	char name[30];
-	void * pSensorTda;
-	void (*sensorRead)(void *,char *, int);
+    char name[30];
+    void * pSensorTda;
+    void (*sensorRead)(void *,char *, int);
 
 }registeredSensors[MAX_SENSORS];
 
 void dataTransmitterInit(void)
 {
-	for(int i=0;i<MAX_SENSORS;i++) registeredSensors[i].sensorRead = NULL; //to crete free slots
+    for(int i=0;i<MAX_SENSORS;i++) registeredSensors[i].sensorRead = NULL; //to crete free slots
 }
 
 int dataTransmitterRegisterSensor(char * name, void * pSensorTda, void (*sensorRead)(void *,char *, int))
 {
-	for(int i=0;i<MAX_SENSORS;i++)
-	{
-		if(registeredSensors[i].sensorRead == NULL)
-		{
-			strcpy(registeredSensors[i].name, name);
-			registeredSensors[i].pSensorTda = pSensorTda;
-			registeredSensors[i].sensorRead = sensorRead;
-			return 1;
-		}
-	}
-	return 0;
+    for(int i=0;i<MAX_SENSORS;i++)
+    {
+        if(registeredSensors[i].sensorRead == NULL)
+        {
+            strcpy(registeredSensors[i].name, name);
+            registeredSensors[i].pSensorTda = pSensorTda;
+            registeredSensors[i].sensorRead = sensorRead;
+            return 1;
+        }
+    }
+    return 0;
 }
 
 void appendToTxBuffer(char * txBuffer, char *name, char *value)
 {
-	int len = strlen(txBuffer);
-	sprintf(&txBuffer[len],"\"%s\":%s,",name,value);
+    int len = strlen(txBuffer);
+    sprintf(&txBuffer[len],"\"%s\":%s,",name,value);
 }
 
 void dataTransmitterTask(void * parameter)
 {
-	char * txBuffer = malloc(TX_BUFF_SIZE);
-	while(1)
-	{
-		vTaskDelay(MILISECONDS_PER_TRANSFER / portTICK_PERIOD_MS);
+    char * txBuffer = malloc(TX_BUFF_SIZE);
+    while(1)
+    {
+        vTaskDelay(MILISECONDS_PER_TRANSFER / portTICK_PERIOD_MS);
         wifi_wait_connected();
         strcpy(txBuffer,"{");
-		for(int i=0;i<MAX_SENSORS;i++)
-		{
-			if(registeredSensors[i].sensorRead != NULL)
-			{
-				char value[100];
-				registeredSensors[i].sensorRead( registeredSensors[i].pSensorTda,value,100);
-				appendToTxBuffer(txBuffer, registeredSensors[i].name, value);
-			}
-		}
-		txBuffer[strlen(txBuffer) -1] = '}'; //changing , for }
-		printf("---Temperature is:");
-		printf(txBuffer);
+        for(int i=0;i<MAX_SENSORS;i++)
+        {
+            if(registeredSensors[i].sensorRead != NULL)
+            {
+                char value[100];
+                registeredSensors[i].sensorRead( registeredSensors[i].pSensorTda,value,100);
+                appendToTxBuffer(txBuffer, registeredSensors[i].name, value);
+            }
+        }
+        txBuffer[strlen(txBuffer) -1] = '}'; //changing , for }
+        printf("---Temperature is:");
+        printf("%s\n", txBuffer);
         mqtt_app_send_metric(txBuffer);
-	}
+    }
 }
 
 void dataTransmitterStart(void)
@@ -213,5 +210,37 @@ void dataTransmitterStart(void)
     ESP_ERROR_CHECK(esp_netif_init());
 
     mqtt_app_start();
-	xTaskCreate(dataTransmitterTask,"dataTxTask", 10000, NULL, 1, NULL);
+    xTaskCreate(dataTransmitterTask,"dataTxTask", 10000, NULL, 1, NULL);
+}
+
+void jsonHandler(char * data) {
+    cJSON *json = cJSON_Parse(data);
+
+    if (json != NULL) {
+        cJSON *command = cJSON_GetObjectItem(json, "command");
+        cJSON *pin = cJSON_GetObjectItem(json, "pin");
+        cJSON *duration = cJSON_GetObjectItem(json, "duration");
+
+        if (command != NULL && pin != NULL && duration != NULL) {
+            if (strcmp(command->valuestring, "prender") == 0) {
+                int pin_number = pin->valueint;
+                int duration_ms = duration->valueint;
+
+                esp_mqtt_client_publish(global_client, "/topic/test", "prender", 0, 1, 0);
+                activatePinWithDuration(pin_number, duration_ms);
+            }
+        }
+
+        cJSON_Delete(json);
+    }
+}
+
+void activatePinWithDuration(int pin, int duration_ms) {
+    // Configurar el pin como salida si es necesario
+    gpio_pad_select_gpio(pin);
+    gpio_set_direction(pin, GPIO_MODE_OUTPUT);
+
+    gpio_set_level(pin, 1);
+    vTaskDelay(duration_ms / portTICK_PERIOD_MS);
+    gpio_set_level(pin, 0);
 }
