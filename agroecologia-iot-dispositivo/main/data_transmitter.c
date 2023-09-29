@@ -18,7 +18,7 @@
 static const char *TAG = "MQTT_TRANSMITTER";
 
 // Set your local broker URI
-#define BROKER_URI                      projectConfig.brockerUri
+#define BROKER_URI                      projectConfig.brokerUri
 #define MOSQUITO_USER_NAME              projectConfig.mosquittoUserName
 #define MOSQUITO_USER_PASSWORD          projectConfig.mosquittoUserPassword
 #define MOSQUITO_URL_METRIC_PUBLISH     projectConfig.urlPublish
@@ -51,7 +51,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 {
     ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     esp_mqtt_event_handle_t event = event_data;
-    switch ((esp_mqtt_event_id_t)event_id) {
+    switch ((esp_mqtt_event_id_t) event_id) {
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
             esp_mqtt_client_subscribe(global_client, MOSQUITO_URL_SUBSCIPTION, 1);
@@ -134,13 +134,7 @@ static void mqtt_app_start()
     esp_mqtt_client_start(global_client);
 }
 
-struct
-{
-    char name[30];
-    void * pSensorTda;
-    void (*sensorRead)(void *,char *, int);
-
-}registeredSensors[MAX_SENSORS];
+struct Sensor registeredSensors[MAX_SENSORS];
 
 void dataTransmitterInit(void)
 {
@@ -170,7 +164,7 @@ void appendToTxBuffer(char * txBuffer, char *name, char *value)
 
 void dataTransmitterTask(void * parameter)
 {
-    char * txBuffer = malloc(TX_BUFF_SIZE);
+    char *txBuffer = malloc(TX_BUFF_SIZE);
     while(1)
     {
         vTaskDelay(MILISECONDS_PER_TRANSFER / portTICK_PERIOD_MS);
@@ -181,7 +175,7 @@ void dataTransmitterTask(void * parameter)
             if(registeredSensors[i].sensorRead != NULL)
             {
                 char value[100];
-                registeredSensors[i].sensorRead( registeredSensors[i].pSensorTda,value,100);
+                registeredSensors[i].sensorRead(registeredSensors[i].pSensorTda,value,100);
                 appendToTxBuffer(txBuffer, registeredSensors[i].name, value);
             }
         }
@@ -228,6 +222,18 @@ void jsonHandler(char * data) {
 
                 esp_mqtt_client_publish(global_client, "/topic/test", "prender", 0, 1, 0);
                 activatePinWithDuration(pin_number, duration_ms);
+            } else if (strcmp(command->valuestring, "agregar") == 0) {
+                /*
+                 * TODO implementar funcion para agregar el sensor en el array
+                 * Requiere nombre del sensor y tipo.
+                 * */
+            } else if (strcmp(command->valuestring, "eliminar") == 0) {
+                /*
+                 * TODO implementar funcion para eliminar el sensor en el array
+                 * Requiere nombre del sensor.
+                 * */
+            } else if (strcmp(command->valuestring, "lista") == 0) {
+                /*TODO implementar funcion para devolver el listado guardado en la memoria nvs*/
             }
         }
 
