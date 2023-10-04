@@ -71,10 +71,12 @@ const MetricAcceptationRangeDetail: React.FC = () => {
           metricAcceptationRangeId: +id,
           name: values.name,
           startValue: Number(
-            formatMetricValue(values.startValue, values.metricTypeCode)
+            values.startValue
+            //formatMetricValue(values.startValue, values.metricTypeCode)
           ),
           endValue: Number(
-            formatMetricValue(values.endValue, values.metricTypeCode)
+            values.endValue
+            //formatMetricValue(values.endValue, values.metricTypeCode)
           ),
           metricTypeCode: values.metricTypeCode,
         };
@@ -83,10 +85,12 @@ const MetricAcceptationRangeDetail: React.FC = () => {
         const entity: MetricAcceptationRangeAddType = {
           name: values.name,
           startValue: Number(
-            formatMetricValue(values.startValue, values.metricTypeCode)
+            values.startValue
+            //formatMetricValue(values.startValue, values.metricTypeCode)
           ),
           endValue: Number(
-            formatMetricValue(values.endValue, values.metricTypeCode)
+            values.endValue
+            //formatMetricValue(values.endValue, values.metricTypeCode)
           ),
           metricTypeCode: values.metricTypeCode,
         };

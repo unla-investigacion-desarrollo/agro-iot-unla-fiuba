@@ -18,6 +18,12 @@ const SectorMetricsGrid: React.FC<Props> = ({ readings }) => {
     {
       title: "Valor",
       dataIndex: "value",
+      render: (cell: any, row: IMetricReadingDTO) => (
+        <>
+          {formatMetricValueWithUnit(+row.value, row.metricTypeCode)}{" "}
+          {row.isCurrentReading && <Tag style={{ marginLeft: 5 }}>Actual</Tag>}
+        </>
+      ),
       responsive: ["sm", "md"],
     },
     {
