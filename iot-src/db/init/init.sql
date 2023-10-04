@@ -52,7 +52,7 @@ CREATE TABLE `applicationuser` (
 
 LOCK TABLES `applicationuser` WRITE;
 /*!40000 ALTER TABLE `applicationuser` DISABLE KEYS */;
-INSERT INTO `applicationuser` VALUES (1,'2023-06-06 22:43:02.000000',1,NULL,0,NULL,'Sterling.Kovacek@yahoo.com',_binary '','Vance','$2a$10$WhLO7aI6oqXxm.SY1lr8JezChmVWfM60PcuvXvRDQDa15oGKTE5CC','Wilderman','doguidogui',1);
+INSERT INTO `applicationuser` VALUES (1,'2023-06-06 22:43:02.000000',1,NULL,0,NULL,'Sterling.Kovacek@yahoo.com',_binary '','Vance','$2a$10$WhLO7aI6oqXxm.SY1lr8JezChmVWfM60PcuvXvRDQDa15oGKTE5CC','Wilderman','admin',1);
 /*!40000 ALTER TABLE `applicationuser` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -176,7 +176,9 @@ CREATE TABLE `metric_type` (
 
 LOCK TABLES `metric_type` WRITE;
 /*!40000 ALTER TABLE `metric_type` DISABLE KEYS */;
-INSERT INTO `agro_iot`.`metric_type` (`code`, `description`) VALUES ('hum', 'métrica de % de aceptación de humedad');
+INSERT INTO `agro_iot`.`metric_type` (`code`, `description`) VALUES ('ta', 'Temperatura ambiente');
+INSERT INTO `agro_iot`.`metric_type` (`code`, `description`) VALUES ('hr', 'Humedad relativa');
+INSERT INTO `agro_iot`.`metric_type` (`code`, `description`) VALUES ('hs', 'Humedad sustrato');
 /*!40000 ALTER TABLE `metric_type` ENABLE KEYS */;
 UNLOCK TABLES;
 

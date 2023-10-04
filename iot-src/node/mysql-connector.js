@@ -4,10 +4,10 @@ var mysql = require('mysql');
 require('dotenv').config();
 var connection = mysql.createConnection({
     host     : process.env.NODE_DB_HOST,
-    port     : process.env.NODE_DB_PORT,
-    user     : process.env.NODE_DB_USER,
-    password : process.env.NODE_DB_PASS,
-    database : process.env.NODE_DB_DATABASE
+    port     : process.env.MYSQLDB_DOCKER_PORT,
+    user     : process.env.MYSQLDB_USER,
+    password : process.env.MYSQLDB_ROOT_PASSWORD,
+    database : process.env.MYSQLDB_DATABASE
 });
 
 //=======[ Main module code ]==================================================

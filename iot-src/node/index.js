@@ -45,11 +45,11 @@ client.on('message', function (topic, message) {
       insertMetric(objResponse.ta, 'ta', 1);
     }
     if(objResponse.hasOwnProperty('hr')){
-      console.log("Temperatura ambiente: " + objResponse.hr);
+      console.log("Humedad relativa: " + objResponse.hr);
       insertMetric(objResponse.hr, 'hr', 1);
     }
     if(objResponse.hasOwnProperty('hs')){
-      console.log("Temperatura ambiente: " + objResponse.hs);
+      console.log("Humedad sustrato: " + objResponse.hs);
       insertMetric(objResponse.hs, 'hs', 1);
     }
   }
