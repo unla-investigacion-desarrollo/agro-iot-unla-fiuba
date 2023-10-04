@@ -54,9 +54,9 @@ void app_main(void)
     vTaskDelay(5000 / portTICK_PERIOD_MS); // dht22 necsita un tiempo para estabilizarse
 
     dataTransmitterInit();
-    dataTransmitterRegisterSensor("ta", pDht22, dht22GenericReadTemp);
-    dataTransmitterRegisterSensor("hr", pDht22, dht22GenericReadRH);
-    dataTransmitterRegisterSensor("sm", pSoilMoisture, soilMoistureGenericRead);
+    dataTransmitterRegisterSensor("ta", pDht22, dht22GenericReadTemp); //Temperatura ambiente
+    dataTransmitterRegisterSensor("hr", pDht22, dht22GenericReadRH); //Humedad relativa
+    dataTransmitterRegisterSensor("hs", pSoilMoisture, soilMoistureGenericRead); //Humedad sustrato
 
     dataTransmitterStart();
 }
