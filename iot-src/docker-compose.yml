@@ -50,7 +50,7 @@ services:
     depends_on:
       -               mysqldb
     ports: 
-      -               "8000:3000"
+      -               "8000:3005"
     command:          nodemon /home/node/app/src/index.js
 
   react-frontend:
@@ -59,12 +59,13 @@ services:
     build:
       context:        ./react
     ports:
-      -               "3000:3000"
+      -               "3006:3000"
     container_name:   react-frontend
     stdin_open:       true
     volumes:
        -              ./react:/usr/src/app/react
        -              /usr/src/app/react/node_modules
+    env_file:         ./.env
     networks:
       -               app-fullstack-net 
 
