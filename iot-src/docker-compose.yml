@@ -18,7 +18,7 @@ services:
     networks:
       -              app-fullstack-net
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "$NODE_DB_HOST", "-u", "$MYSQLDB_USER", "--password=$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "$NODE_DB_HOST", "-u", "$MYSQLDB_USER", "--password=$MYSQLDB_ROOT_PASSWORD"]
       interval: 10s
       timeout: 5s
       retries: 3

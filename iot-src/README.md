@@ -6,7 +6,10 @@ El proyecto consta de:
 - Spring Java (para ver la documentación ir a /swagger-ui/index.html)
 - React
 
-Todos estos se levantan con docker utilizando el comando:
+Si es la primera que vez que se corre el proyecto, primero, se tiene que ir a la carpeta node y correr el comando:
+npm install
+
+Luego, todos estos se levantan con docker utilizando el siguiente comando desde la carpeta raíz (iot-src):
 docker compose up
 
 Para esto, es necesario constar con un .env al mismo nivel que el docker-compose.yml con el siguiente contenido:
