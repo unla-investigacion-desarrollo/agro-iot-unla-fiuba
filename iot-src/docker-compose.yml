@@ -16,7 +16,12 @@ services:
       -             ./db/init:/docker-entrypoint-initdb.d 
       -             ./db/data:/var/lib/mysql
     networks:
-      -              app-fullstack-net  
+      -              app-fullstack-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "$NODE_DB_HOST", "-u", "$MYSQLDB_USER", "--password=$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   spring-backend:
       env_file:       ./.env
@@ -51,7 +56,8 @@ services:
     networks:
       -               app-fullstack-net
     depends_on:
-      -               mysqldb
+      mysqldb:
+        condition: service_healthy
     ports: 
       -               "$NODE_PORT:$NODE_PORT"
     command:          nodemon /home/node/app/src/index.js
