@@ -52,7 +52,7 @@ CREATE TABLE `applicationuser` (
 
 LOCK TABLES `applicationuser` WRITE;
 /*!40000 ALTER TABLE `applicationuser` DISABLE KEYS */;
-INSERT INTO `applicationuser` VALUES (1,'2023-06-06 22:43:02.000000',1,NULL,0,NULL,'Sterling.Kovacek@yahoo.com',_binary '','Vance','$2a$10$WhLO7aI6oqXxm.SY1lr8JezChmVWfM60PcuvXvRDQDa15oGKTE5CC','Wilderman','admin',1);
+INSERT INTO `applicationuser` VALUES (1,'2023-06-06 22:43:02.000000',1,NULL,0,NULL,'gussiciliano@gmail.com',_binary '','Gustavo','$2a$10$WhLO7aI6oqXxm.SY1lr8JezChmVWfM60PcuvXvRDQDa15oGKTE5CC','Siciliano','admin',1);
 /*!40000 ALTER TABLE `applicationuser` ENABLE KEYS */;
 UNLOCK TABLES;
 
