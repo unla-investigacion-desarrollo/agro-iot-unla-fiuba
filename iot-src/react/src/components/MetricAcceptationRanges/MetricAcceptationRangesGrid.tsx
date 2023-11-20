@@ -13,7 +13,6 @@ import {
   ROWS_PER_PAGE,
 } from "../../helpers/grid-helper";
 import { formatMetricValueWithUnit } from "../../helpers/metric-helper";
-import { MetricAcceptationRangesData } from "../../helpers/test-data-helper";
 
 const MetricAcceptationRangesGrid: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);

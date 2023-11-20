@@ -24,6 +24,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.unla.agroecologiaiot.constants.SecurityConstants;
+import org.springframework.beans.factory.annotation.Value;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -36,6 +37,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private SessionRepository sessionRepository;
     @Autowired
     private ITokenService tokenService;
+
+    @Value("${CORS_CONFIG_REACT_SERVER_URL_AND_PORT}")
+    private String corsServerUrlAndPort;
 
     public SecurityConfiguration(ApplicationUserService userService) {
         this.userService = userService;
@@ -67,7 +71,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3006"));
+        configuration.setAllowedOrigins(Arrays.asList(corsServerUrlAndPort));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("*"));

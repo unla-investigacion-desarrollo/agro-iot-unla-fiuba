@@ -67,6 +67,10 @@ function isJson(str) {
 
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
 app.listen(PORT, function(req, res) {
     console.log("NodeJS API running correctly");
 });
