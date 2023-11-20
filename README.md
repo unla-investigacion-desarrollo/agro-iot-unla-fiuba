@@ -1,8 +1,8 @@
 # agro-iot-unla-fiuba
 
 ## Pasos necesarios para finalizar el proceso de subida.
-1- Para levantar el server de MQTT leer el readme dentro de /moquitto-docker
-2- Para levantar la capa lógica leer el readme dentro de /iot-src
+1- Primero, para levantar el server de MQTT leer el readme dentro de /moquitto-docker
+2- Luego, para levantar la capa lógica leer el readme dentro de /iot-src
 
 ## Nombre de aplicación que debe utilizarse.
 sg.unla.edu.ar/iothuertas
