@@ -16,15 +16,21 @@ services:
       -             ./db/init:/docker-entrypoint-initdb.d 
       -             ./db/data:/var/lib/mysql
     networks:
-      -              app-fullstack-net  
+      -              app-fullstack-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "$NODE_DB_HOST", "-u", "$MYSQLDB_USER", "--password=$MYSQLDB_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   spring-backend:
+      env_file:       ./.env
       depends_on:
-        -             mysqldb
+        -             mysqldb  
+      restart:        unless-stopped
       build:          ./spring-agroecologia-iot
-      restart:        on-failure
       ports:
-        -             8080:8080
+        -             $SPRING_PORT:$SPRING_PORT
       environment:
         SPRING_APPLICATION_JSON: '{
           "spring.datasource.url"  : "jdbc:mysql://mysqldb:$MYSQLDB_DOCKER_PORT/$MYSQLDB_DATABASE?useSSL=false",
@@ -32,7 +38,9 @@ services:
           "spring.datasource.password" : "$MYSQLDB_ROOT_PASSWORD",
           "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5Dialect",
           "logging.level.org.hibernate.sql" : "debug",
-          "spring.datasource.driver-class-name": "com.mysql.cj.jdbc.Driver"}'
+          "spring.datasource.driver-class-name": "com.mysql.cj.jdbc.Driver",
+          "server.port": "$SPRING_PORT",
+          "CORS_CONFIG_REACT_SERVER_URL_AND_PORT":"$CORS_CONFIG_REACT_SERVER_URL_AND_PORT"}'
       volumes:
         -             ./spring-agroecologia-iot/logs:/app/logs
       networks:
@@ -48,9 +56,10 @@ services:
     networks:
       -               app-fullstack-net
     depends_on:
-      -               mysqldb
+      mysqldb:
+        condition: service_healthy
     ports: 
-      -               "8000:3000"
+      -               "$NODE_PORT:$NODE_PORT"
     command:          nodemon /home/node/app/src/index.js
 
   react-frontend:
@@ -59,12 +68,13 @@ services:
     build:
       context:        ./react
     ports:
-      -               "3000:3000"
+      -               "$PORT:$PORT"
     container_name:   react-frontend
     stdin_open:       true
     volumes:
        -              ./react:/usr/src/app/react
        -              /usr/src/app/react/node_modules
+    env_file:         ./.env
     networks:
       -               app-fullstack-net 
 

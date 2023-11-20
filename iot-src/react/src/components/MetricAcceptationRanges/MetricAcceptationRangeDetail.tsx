@@ -21,7 +21,6 @@ import {
 } from "../../api/metricAcceptationRanges/models";
 import MetricTypesService from "../../api/metricTypes/MetricTypesService";
 import { IMetricType } from "../../api/metricTypes/models";
-import { formatMetricValue } from "../../helpers/metric-helper";
 import ErrorPage from "../../pages/ErrorPage";
 import BackButton from "../BackButton/BackButton";
 
@@ -86,11 +85,9 @@ const MetricAcceptationRangeDetail: React.FC = () => {
           name: values.name,
           startValue: Number(
             values.startValue
-            //formatMetricValue(values.startValue, values.metricTypeCode)
           ),
           endValue: Number(
             values.endValue
-            //formatMetricValue(values.endValue, values.metricTypeCode)
           ),
           metricTypeCode: values.metricTypeCode,
         };

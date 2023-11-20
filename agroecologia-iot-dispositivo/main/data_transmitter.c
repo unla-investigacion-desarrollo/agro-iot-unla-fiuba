@@ -24,7 +24,7 @@ static const char *TAG = "MQTT_TRANSMITTER";
 #define MOSQUITO_URL_METRIC_PUBLISH     projectConfig.urlPublish
 #define MOSQUITO_URL_SUBSCIPTION        projectConfig.urlSubscription
 
-#define MILISECONDS_PER_TRANSFER 30000
+#define MILISECONDS_PER_TRANSFER 5000
 #define MAX_SENSORS 30
 #define TX_BUFF_SIZE (1024*16) //16k just in case
 

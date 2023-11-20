@@ -8,7 +8,6 @@ import {
   MetricTypeUpdateType,
 } from "../../api/metricTypes/models";
 import ErrorPage from "../../pages/ErrorPage";
-import NotFoundPage from "../../pages/NotFoundPage";
 import BackButton from "../BackButton/BackButton";
 
 const formItemLayout = {
