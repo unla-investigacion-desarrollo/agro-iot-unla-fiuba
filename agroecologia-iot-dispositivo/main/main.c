@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <time.h>
+#include <driver/gpio.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -12,6 +14,7 @@
 #include "timed_outputs.h"
 #include "config.h"
 #include "wifi.h"
+#include "rtc_config.h"
 
 
 void calibrar() {
@@ -41,13 +44,41 @@ void app_main(void)
     ESP_ERROR_CHECK(ret);
 
     wifi_init_sta(projectConfig.wifiSSID, projectConfig.wifiPass);
+    rtc_config_init();
 
-    timedOutputsInit();
-    timedOutputsAdd(2);
+    gpio_set_direction(4, GPIO_MODE_OUTPUT);
+    gpio_set_level(4, 0);
+
+    bool activado = false;
+
+    while (1) {
+        // Verifica la hora actual y si son las 7 AM activa la salida 1 por 1 minuto
+        struct tm timeinfo;
+        time_t now;
+        time(&now);
+        localtime_r(&now, &timeinfo);
+
+        // Si son las 7 AM activa la salida 1 por 1 minuto
+        if (timeinfo.tm_hour == 22 && timeinfo.tm_min == 8 && !activado) {
+            ActivarSalidaParams params = {
+                    .pin = 4,
+                    .time = 60
+            };
+            activar_salida(&params);
+            activado = true;
+        } else if (timeinfo.tm_hour != 7) {
+            activado = false;
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+
+    //timedOutputsInit();
+    //timedOutputsAdd(2);
 
     //calibrar();
 
-    ads1155_t * pAds115 = ads1115Init(0, 0x48, 21, 22);
+    /*ads1155_t * pAds115 = ads1115Init(0, 0x48, 21, 22);
     soil_moisture_t * pSoilMoisture = soilMoistureInit(pAds115, ads1115GenericRead, 1.214, 2.844, 0);
 
     dht22_t * pDht22=dht22Init(15);
@@ -58,5 +89,5 @@ void app_main(void)
     dataTransmitterRegisterSensor("hr", pDht22, dht22GenericReadRH); //Humedad relativa
     dataTransmitterRegisterSensor("hs", pSoilMoisture, soilMoistureGenericRead); //Humedad sustrato
 
-    dataTransmitterStart();
+    dataTransmitterStart();*/
 }

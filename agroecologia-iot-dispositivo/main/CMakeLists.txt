@@ -5,5 +5,6 @@ idf_component_register(SRCS "config.c" "main.c"
 							 "timed_outputs.c"
 							 "wifi.c"
 							 "data_transmitter.c"
+							 "rtc_config.c"
                     INCLUDE_DIRS "")
 
