@@ -16,7 +16,7 @@ import MetricTypesPage from "../pages/MetricTypesPage";
 
 const AppRoutes: React.FC = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={`${process.env.REACT_APP_PATH}`} >
       <Routes>
         <Route
           path={`${URLs.ROOT}/*`}

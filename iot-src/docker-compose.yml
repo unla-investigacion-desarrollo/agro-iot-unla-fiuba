@@ -35,6 +35,7 @@ services:
           "logging.level.org.hibernate.sql" : "debug",
           "spring.datasource.driver-class-name": "com.mysql.cj.jdbc.Driver",
           "server.port": "$SPRING_PORT",
+          "server.servlet.contextPath": "$SPRING_PATH",
           "CORS_CONFIG_REACT_SERVER_URL_AND_PORT":"$CORS_CONFIG_REACT_SERVER_URL_AND_PORT"}'
       volumes:
         -             ./spring-agroecologia-iot/logs:/app/logs
