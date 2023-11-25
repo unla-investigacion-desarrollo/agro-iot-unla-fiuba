@@ -30,7 +30,7 @@ const HeaderMobileMenu: React.FC<Props> = ({ profile }) => {
       />
       <Drawer
         width={248}
-        visible={visible}
+        open={visible}
         onClose={() => setVisible(false)}
         closable
       >
