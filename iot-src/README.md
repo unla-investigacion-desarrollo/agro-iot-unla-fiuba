@@ -26,11 +26,14 @@ NODE_MQTT_SERVER=mqtt:{dirección IP donde corre el server de MQTT}
 
 #Node config
 NODE_PORT= {puerto de Node}
+NODE_PATH=/iothuertas
 
 #Spring config
 SPRING_PORT= {puerto de Spring}
+SPRING_PATH=/iothuertas/
 CORS_CONFIG_REACT_SERVER_URL_AND_PORT= {URL y puerto de React}
 
 #React config
 PORT= {puerto de React} #React Port
 REACT_APP_API_URL= {URL y puerto de Spring}
+REACT_APP_PATH=/iothuertas

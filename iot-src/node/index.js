@@ -65,9 +65,11 @@ function isJson(str) {
   return true;
 }
 
-app.use(express.json());
+const rutaBase = process.env.NODE_PATH;
 
-app.get('/', (req, res) => {
+app.use(rutaBase, express.json());
+
+app.get(`${rutaBase}/`, (req, res) => {
   res.send('Hello World!')
 })
 
