@@ -14,8 +14,13 @@ public class MetricAcceptationRangeModel {
     private long metricAcceptationRangeId;
 
     private String name;
-    private double startValue;
-    private double endValue;
+    private String description;
+    private double taStartValue;
+    private double taEndValue;
+    private double hrStartValue;
+    private double hrEndValue;
+    private double hsStartValue;
+    private double hsEndValue;
     private String metricTypeCode;
 
     private Date createdAt;

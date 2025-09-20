@@ -1,7 +1,6 @@
 package com.unla.agroecologiaiot.models;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,5 +25,7 @@ public class SectorModel {
     private Date createdAt;
     private String crops;
 
-    private List<Long> metricAcceptationRangeIds;
+    private MetricAcceptationRangeModel metricAcceptationRangeModel;
+
+    private long metricAcceptationRangeIds;
 }

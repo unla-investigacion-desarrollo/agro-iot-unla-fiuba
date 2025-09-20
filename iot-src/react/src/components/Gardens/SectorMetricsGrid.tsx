@@ -2,7 +2,6 @@ import { Table, Tag } from "antd";
 import { ColumnType } from "antd/lib/table";
 import { IMetricReadingDTO } from "../../api/metricReadings/models";
 import { formatISODate } from "../../helpers/date-helper";
-import { formatMetricValueWithUnit } from "../../helpers/metric-helper";
 
 interface Props {
   readings: IMetricReadingDTO[];
@@ -11,16 +10,65 @@ interface Props {
 const SectorMetricsGrid: React.FC<Props> = ({ readings }) => {
   const columns: ColumnType<IMetricReadingDTO>[] = [
     {
-      title: "Tipo de métrica",
-      dataIndex: "metricTypeDescription",
+      title: "Humedad Sustrato",
+      dataIndex: "hsValue",
+      align: "center",
+      className: "text-center",
+      render: (cell: any, row: IMetricReadingDTO) => (
+        <>
+          {row.hsValue? `${row.hsValue}%` : "-"}
+          {row.isCurrentReading && <Tag style={{ marginLeft: 5 }}>Actual</Tag>}
+        </>
+      ),
       responsive: ["sm", "md"],
     },
     {
-      title: "Valor",
-      dataIndex: "value",
+      title: "Humedad Relativa",
+      dataIndex: "hrValue",
+      align: "center",
+      className: "text-center",
       render: (cell: any, row: IMetricReadingDTO) => (
         <>
-          {formatMetricValueWithUnit(+row.value, row.metricTypeCode)}{" "}
+          {row.hrValue? `${row.hrValue}%` : "-"}
+          {row.isCurrentReading && <Tag style={{ marginLeft: 5 }}>Actual</Tag>}
+        </>
+      ),
+      responsive: ["sm", "md"],
+    },
+    {
+      title: "Temperatura Ambiente",
+      dataIndex: "taValue",
+      align: "center",
+      className: "text-center",
+      render: (cell: any, row: IMetricReadingDTO) => (
+        <>
+          {row.taValue? `${row.taValue}°C` : "-"}
+          {row.isCurrentReading && <Tag style={{ marginLeft: 5 }}>Actual</Tag>}
+        </>
+      ),
+      responsive: ["sm", "md"],
+    },
+    {
+      title: "Lluvia próxima",
+      dataIndex: "rainForecast",
+      align: "center",
+      className: "text-center",
+      render: (cell: any, row: IMetricReadingDTO) => (
+        <>
+          {row.rainForecast !== false ? "Si" : "No"}
+          {row.isCurrentReading && <Tag style={{ marginLeft: 5 }}>Actual</Tag>}
+        </>
+      ),
+      responsive: ["sm", "md"],
+    },
+    {
+      title: "Riego",
+      dataIndex: "irrigation",
+      align: "center",
+      className: "text-center", width: 150,
+      render: (cell: any, row: IMetricReadingDTO) => (
+        <>
+          {row.irrigation !== false ? "Si" : "No"}
           {row.isCurrentReading && <Tag style={{ marginLeft: 5 }}>Actual</Tag>}
         </>
       ),
@@ -29,24 +77,10 @@ const SectorMetricsGrid: React.FC<Props> = ({ readings }) => {
     {
       title: "Fecha de captura",
       dataIndex: "readingDate",
+      align: "center",
+      className: "text-center",
       render: (cell: any) => formatISODate(cell),
       responsive: ["sm", "md"],
-    },
-    {
-      title: "Lecturas",
-      render: (cell: any, row: IMetricReadingDTO) => (
-        <>
-          <p>{row.metricTypeDescription}</p>
-          <p>
-            {formatMetricValueWithUnit(+row.value, row.metricTypeCode)}{" "}
-            {row.isCurrentReading && (
-              <Tag style={{ marginLeft: 5 }}>Actual</Tag>
-            )}
-          </p>
-          <p>{formatISODate(row.readingDate)}</p>
-        </>
-      ),
-      responsive: ["xs"],
     },
   ];
 

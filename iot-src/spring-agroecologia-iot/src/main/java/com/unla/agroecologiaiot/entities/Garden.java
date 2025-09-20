@@ -12,9 +12,12 @@ import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +34,6 @@ public class Garden extends AuditableEntity<Long>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long gardenId;
-
     private String name;
     private String description;
     private String location;
@@ -41,6 +43,8 @@ public class Garden extends AuditableEntity<Long>{
     private ApplicationUser owner;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "garden")
+    @OrderBy("id ASC")
+    @JsonManagedReference
     private Set<Sector> sectors;
 
 }

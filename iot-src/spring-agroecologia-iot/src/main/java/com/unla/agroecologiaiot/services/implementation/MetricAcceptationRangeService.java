@@ -5,7 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.modelmapper.ModelMapper;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -15,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import com.unla.agroecologiaiot.entities.ApplicationUser;
 import com.unla.agroecologiaiot.entities.MetricAcceptationRange;
-import com.unla.agroecologiaiot.entities.MetricType;
 import com.unla.agroecologiaiot.entities.Sector;
 import com.unla.agroecologiaiot.helpers.FilterHelper.Filter;
 import com.unla.agroecologiaiot.helpers.MessageHelper.Message;
@@ -37,6 +40,9 @@ import com.unla.agroecologiaiot.shared.paginated.PagerParameters;
 
 @Service("metricAcceptationRangeService")
 public class MetricAcceptationRangeService implements IMetricAcceptationRangeService {
+    
+    //private static final Logger logger = LoggerFactory.getLogger(MetricAcceptationRangeService.class);
+
     private ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
@@ -62,33 +68,15 @@ public class MetricAcceptationRangeService implements IMetricAcceptationRangeSer
     @Override
     public ResponseEntity<String> saveOrUpdate(MetricAcceptationRangeModel model, long idOwner) {
         try {
-            if (!(model.getStartValue() >= 0 && model.getEndValue() <= 100)) {
-                return Message.ErrorValidation();
-            }
-
-            Optional<MetricAcceptationRange> dbMetricAcceptationRange = metricAcceptationRangeRepository
-                    .findByName(model.getName());
-
+            Optional<MetricAcceptationRange> dbMetricAcceptationRange = metricAcceptationRangeRepository.find(model.getName(), model.getDescription());
             if (dbMetricAcceptationRange.isPresent()) {
-                return Message.ErrorValidation();
+                return Message.Ok("Existe");
             }
 
             ApplicationUser user = applicationUserRepository.getById(idOwner);
-
-            if (user == null) {
-                return Message.ErrorValidation();
-            }
-
-            MetricType metricType = metricTypeRepository.findByCode(model.getMetricTypeCode());
-
-            if (metricType == null) {
-                return Message.ErrorValidation();
-            }
-
             model.setMetricAcceptationRangeId(0);
             MetricAcceptationRange metricAcceptationRange = modelMapper.map(model, MetricAcceptationRange.class);
             metricAcceptationRange.setOwner(user);
-            metricAcceptationRange.setMetricType(metricType);
 
             long response = metricAcceptationRangeRepository.save(metricAcceptationRange).getMetricAcceptationRangeId();
 
@@ -132,22 +120,33 @@ public class MetricAcceptationRangeService implements IMetricAcceptationRangeSer
     public ResponseEntity<String> put(MetricAcceptationRangeModel model, long id) {
         try {
             MetricAcceptationRange metricAcceptationRange = metricAcceptationRangeRepository.getById(id);
+            ModelMapper modelMapper = new ModelMapper();
+            MetricAcceptationRange metricasFront = modelMapper.map(model, MetricAcceptationRange.class);
 
-            if (metricAcceptationRange == null) {
-                return Message.ErrorSearchEntity();
+            if (!metricAcceptationRange.equals(metricasFront)){
+                long response = metricAcceptationRangeRepository.save(mergeValues(metricAcceptationRange, model)).getMetricAcceptationRangeId();
+                return Message.Ok(response);
+            }else{
+                return Message.Ok("Iguales");
             }
-
-            metricAcceptationRange.setName(model.getName());
-            metricAcceptationRange.setStartValue(model.getStartValue());
-            metricAcceptationRange.setEndValue(model.getEndValue());
-
-            long response = metricAcceptationRangeRepository.save(metricAcceptationRange).getMetricAcceptationRangeId();
-
-            return Message.Ok(response);
-
+        } catch (EntityNotFoundException e) {
+            e.printStackTrace();
+            return Message.ErrorSearchEntity();
         } catch (Exception e) {
             return Message.ErrorException(e);
         }
+    }
+
+    private MetricAcceptationRange mergeValues(MetricAcceptationRange entity, MetricAcceptationRangeModel model) {
+        entity.setName(model.getName());
+        entity.setDescription(model.getDescription());
+        entity.setTaStartValue(model.getTaStartValue());
+        entity.setTaEndValue(model.getTaEndValue());
+        entity.setHrStartValue(model.getHrStartValue());
+        entity.setHrEndValue(model.getHrEndValue());
+        entity.setHsStartValue(model.getHsStartValue());
+        entity.setHsEndValue(model.getHsEndValue());
+        return entity;
     }
 
     @Override
@@ -162,6 +161,7 @@ public class MetricAcceptationRangeService implements IMetricAcceptationRangeSer
 
             metricAcceptationRange.get().setDeleted(true);
 
+            /*
             for (Sector sector : metricAcceptationRange.get().getSectors()) {
                 sector.setMetricAcceptationRanges(
                         sector.getMetricAcceptationRanges().stream().filter(sectorMetric -> sectorMetric
@@ -169,7 +169,7 @@ public class MetricAcceptationRangeService implements IMetricAcceptationRangeSer
                                         .getMetricAcceptationRangeId())
                                 .collect(Collectors.toSet()));
             }
-
+            */
             metricAcceptationRangeRepository.save(metricAcceptationRange.get());
 
             return Message.Ok(true);
@@ -225,17 +225,13 @@ public class MetricAcceptationRangeService implements IMetricAcceptationRangeSer
 
             pageParameters.setFilters(filters);
             SearchEspecification<MetricAcceptationRange> especification = new SearchEspecification<>(pageParameters);
-            Page<MetricAcceptationRange> dbMetricAcceptationRange = metricAcceptationRangeRepository
-                    .findAll(especification, page);
-
+            Page<MetricAcceptationRange> dbMetricAcceptationRange = metricAcceptationRangeRepository.findAll(especification, page);
             List<MetricAcceptationRangeModel> metricAcceptationRangeModels = new ArrayList<MetricAcceptationRangeModel>();
-
             for (MetricAcceptationRange metricAcceptationRange : dbMetricAcceptationRange.toList()) {
                 MetricAcceptationRangeModel metricAcceptationRangeModel = modelMapper.map(metricAcceptationRange,
                         MetricAcceptationRangeModel.class);
                 metricAcceptationRangeModels.add(metricAcceptationRangeModel);
             }
-
             paginatedList.setList(metricAcceptationRangeModels);
             paginatedList.setCount(dbMetricAcceptationRange.getTotalElements());
             paginatedList.setIndex(dbMetricAcceptationRange.getNumber());

@@ -1,3 +1,4 @@
+import { IMetricAcceptationRange } from "../metricAcceptationRanges/models";
 import { IMetricReadingDTO } from "../metricReadings/models";
 
 export interface ISector {
@@ -6,13 +7,13 @@ export interface ISector {
   centralizerKey: string;
   gardenId: number;
   crops: string;
-  metricAcceptationRangeIds: number[];
+  metricAcceptationRangeIds: number;
 }
 
 export interface ISectorBasicData {
   sectorId: number;
   name: string;
-  sectorMetricRanges: ISectorMetricRange[];
+  metricAcceptationRange: IMetricAcceptationRange;
 }
 
 export interface ISectorMetricRange {
@@ -26,5 +27,15 @@ export interface ISectorMetricRange {
 export interface ISectorMetricData {
   sectorId: number;
   sectorName: string;
+  readings: IMetricReadingDTO[];
+}
+
+export interface ISectorDashboard {
+  sectorId: number;
+  name: string;
+  centralizerKey: string;
+  gardenId: number;
+  crops: string;
+  metricAcceptationRange: IMetricAcceptationRange;
   readings: IMetricReadingDTO[];
 }

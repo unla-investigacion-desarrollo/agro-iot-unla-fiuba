@@ -25,4 +25,7 @@ public interface MetricAcceptationRangeRepository
         public abstract MetricAcceptationRange findByIdAndFetchSectorsEagerly(@Param("id") long id);
 
         public abstract List<MetricAcceptationRange> findByOwnerUserIdAndIsDeleted(long ownerUserId, boolean isDeleted);
+
+        @Query("SELECT c FROM MetricAcceptationRange c WHERE c.isDeleted = false AND c.name = (:name) AND c.description = (:desc)")
+        public abstract Optional<MetricAcceptationRange> find(@Param("name") String name, @Param("desc") String description);
 }

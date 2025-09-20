@@ -4,6 +4,7 @@ export enum URLs {
   LOGOUT = "/logout",
 
   //Business
+  DASHBOARD = "/dashboard",
   USERS = "/usuarios",
   ROLES = "/roles",
   GARDENS = "/huertas",

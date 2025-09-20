@@ -13,7 +13,7 @@ import {
   Tag,
 } from "antd";
 import { useForm } from "antd/lib/form/Form";
-import { useEffect, useState } from "react";
+import  React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import GardensService from "../../api/gardens/GardensService";
 import {
@@ -66,14 +66,7 @@ const GardenDetail = () => {
   const handleSubmit = async (values: FormValues) => {
     let invalidSectors: string[] = [];
 
-    values.sectors.forEach((sector) => {
-      let sectorRanges = metricAcceptationRanges.filter((i) =>
-        sector.metricAcceptationRangeIds.includes(i.metricAcceptationRangeId)
-      );
-
-      let groups = Object.values(groupBy(sectorRanges, "metricTypeCode"));
-      if (groups.find((i) => i.length > 1)) invalidSectors.push(sector.name);
-    });
+    
 
     if (invalidSectors.length) {
       message.error(
@@ -209,7 +202,7 @@ const GardenDetail = () => {
             {(sectors, { add, remove }) => (
               <>
                 {sectors.map(({ key, name }) => (
-                  <>
+                  <React.Fragment key={key}>
                     <Divider>Datos del sector</Divider>
                     <Form.Item
                       label="Nombre"
@@ -219,7 +212,7 @@ const GardenDetail = () => {
                       <Input />
                     </Form.Item>
                     <Form.Item
-                      label="Cultivos"
+                      label="Descripción de Cultivos"
                       name={[name, "crops"]}
                       rules={[{ required: true, message: "Campo obligatorio" }]}
                     >
@@ -250,15 +243,14 @@ const GardenDetail = () => {
                     </Form.Item>
 
                     <Form.Item
-                      label="Rangos de métrica"
+                      label="Métrica de Cultivo"
                       name={[name, "metricAcceptationRangeIds"]}
                       rules={[{ required: true, message: "Campo obligatorio" }]}
-                      extra="Debe seleccionar como máximo un rango para cada tipo de métrica disponible"
+                      extra="Debe seleccionar un conjunto de métricas segun el tipo de cultivo disponible"
                     >
                       <Select
                         placeholder="Seleccione rangos de métrica"
                         optionFilterProp="children"
-                        mode="multiple"
                         allowClear
                         options={Object.values(
                           groupBy(metricAcceptationRanges, "metricTypeCode")
@@ -297,7 +289,7 @@ const GardenDetail = () => {
                         icon={<MinusOutlined />}
                       />
                     </Popconfirm>
-                  </>
+                  </React.Fragment>
                 ))}
 
                 <Row gutter={12} style={{ justifyContent: "center" }}>

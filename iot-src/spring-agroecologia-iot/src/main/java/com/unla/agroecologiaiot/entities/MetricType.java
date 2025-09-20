@@ -19,9 +19,9 @@ public class MetricType {
     private String code;
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "metricType")
-    private Set<MetricReading> metricReadings;
+    //@OneToMany(fetch = FetchType.LAZY, mappedBy = "metricType")
+    //private Set<MetricReading> metricReadings;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "metricType")
-    private Set<MetricAcceptationRange> metricAcceptationRanges;
+    //@OneToMany(fetch = FetchType.LAZY, mappedBy = "metricType")
+    //private Set<MetricAcceptationRange> metricAcceptationRanges;
 }

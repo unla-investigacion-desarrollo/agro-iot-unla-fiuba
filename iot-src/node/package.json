@@ -1,6 +1,6 @@
 {
   "name": "agro-iot-unla-fiuba-node",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.17.1",
     "mqtt": "^4.3.7",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "node-fetch": "^2.7.0"
   }
 }

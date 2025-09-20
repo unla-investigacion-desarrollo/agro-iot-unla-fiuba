@@ -96,6 +96,7 @@ UNLOCK TABLES;
 -- DROP TABLE IF EXISTS `metric_acceptation_range`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
+/* Se modifica para multiples lecturas en una misma metrica
 CREATE TABLE `metric_acceptation_range` (
   `metric_acceptation_range_id` bigint NOT NULL AUTO_INCREMENT,
   `created_at` datetime(6) NOT NULL,
@@ -113,6 +114,27 @@ CREATE TABLE `metric_acceptation_range` (
   KEY `FK_MetricAcceptationRange_User` (`owner_user_id`),
   CONSTRAINT `FK_MetricAcceptationRange_MetricType` FOREIGN KEY (`metric_type_id`) REFERENCES `metric_type` (`code`),
   CONSTRAINT `FK_MetricAcceptationRange_User` FOREIGN KEY (`owner_user_id`) REFERENCES `applicationuser` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+*/
+CREATE TABLE `metric_acceptation_range` (
+  `metric_acceptation_range_id` bigint NOT NULL AUTO_INCREMENT,
+  `created_at` datetime(6) NOT NULL,
+  `created_by` bigint NOT NULL,
+  `edited_by` bigint DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `updated_at` datetime(6) DEFAULT NULL,
+  `ta_start_value` double DEFAULT NULL,
+  `ta_end_value` double DEFAULT NULL,
+  `hr_start_value` double DEFAULT NULL,
+  `hr_end_value` double DEFAULT NULL,
+  `hs_start_value` double DEFAULT NULL,
+  `hs_end_value` double DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `owner_user_id` bigint NOT NULL,
+  PRIMARY KEY (`metric_acceptation_range_id`),
+  KEY `FK_MetricAcceptationRange_User` (`owner_user_id`),
+  CONSTRAINT `FK_MetricAcceptationRange_User2` FOREIGN KEY (`owner_user_id`) REFERENCES `applicationuser` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -132,6 +154,7 @@ UNLOCK TABLES;
 -- DROP TABLE IF EXISTS `metric_reading`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
+/*
 CREATE TABLE `metric_reading` (
   `metric_reading_id` bigint NOT NULL AUTO_INCREMENT,
   `reading_date` datetime(6) DEFAULT NULL,
@@ -144,6 +167,21 @@ CREATE TABLE `metric_reading` (
   KEY `FK_MetricReading_Sector` (`sector_id`),
   CONSTRAINT `FK_MetricReading_MetricType` FOREIGN KEY (`metric_type_id`) REFERENCES `metric_type` (`code`),
   CONSTRAINT `FK_MetricReading_Sector` FOREIGN KEY (`sector_id`) REFERENCES `sector` (`sector_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+*/
+CREATE TABLE `metric_reading` (
+  `metric_reading_id` bigint NOT NULL AUTO_INCREMENT,
+  `reading_date` datetime(6) DEFAULT NULL,
+  `ta_value` varchar(255) DEFAULT NULL,
+  `hr_value` varchar(255) DEFAULT NULL,
+  `hs_value` varchar(255) DEFAULT NULL,`rain_forecast`, `irrigation`
+  `rain_forecast` TINYINT(1) DEFAULT 0,
+  `irrigation` TINYINT(1) DEFAULT 0,
+  `value_type` varchar(255) DEFAULT NULL,
+  `sector_id` bigint NOT NULL,
+  PRIMARY KEY (`metric_reading_id`),
+  KEY `FK_MetricReading_Sector` (`sector_id`),
+  CONSTRAINT `FK_MetricReading2_Sector` FOREIGN KEY (`sector_id`) REFERENCES `sector` (`sector_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -230,9 +268,12 @@ CREATE TABLE `sector` (
   `crops` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `garden_id` bigint NOT NULL,
+  `metric_acceptation_range_id` bigint,
   PRIMARY KEY (`sector_id`),
   KEY `FK_Garden_Sector` (`garden_id`),
+  KEY `FK_MetricAcceptationRange_Sector` (`metric_acceptation_range_id`),
   CONSTRAINT `FK_Garden_Sector` FOREIGN KEY (`garden_id`) REFERENCES `garden` (`garden_id`)
+  CONSTRAINT `FK_MetricAcceptationRange_Sector` FOREIGN KEY (`metric_acceptation_range_id`) REFERENCES `metric_acceptation_range` (`metric_acceptation_range_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -1,4 +1,4 @@
-import { ISector, ISectorBasicData } from "../sectors/models";
+import { ISector, ISectorBasicData, ISectorDashboard } from "../sectors/models";
 
 export interface IGarden {
   gardenId: number;
@@ -26,4 +26,14 @@ export interface IGardenBasicInfo {
   description: string;
   location: string;
   sectorRangesBasicData: ISectorBasicData[];
+}
+
+export interface IGardenDashboard {
+  gardenId: number;
+  name: string;
+  description: string;
+  location: string;
+  ownerUserId: number;
+  createdAt?: string;
+  sectors: ISectorDashboard[];
 }

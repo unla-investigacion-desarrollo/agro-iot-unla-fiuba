@@ -3,7 +3,8 @@ import {
   GridParams,
   transformGridParamsToFetchGridParams,
 } from "../../helpers/grid-helper";
-import { ISectorMetricData } from "../sectors/models";
+import { ISectorDashboard, ISectorMetricData } from "../sectors/models";
+import { IMetricReadingDTO } from "../metricReadings/models";
 import FetchService from "../shared/FetchService";
 import { PaginatedList } from "../shared/models";
 import {
@@ -11,6 +12,7 @@ import {
   GardenUpdateType,
   IGarden,
   IGardenBasicInfo,
+  IGardenDashboard,
 } from "./models";
 
 class GardensService {
@@ -59,6 +61,26 @@ class GardensService {
   static async delete(id: string): Promise<void> {
     await FetchService.delete({
       url: `${API.GARDENS}/${id}`,
+    });
+  }
+
+  static async Dashboard(): Promise<IGardenDashboard[]> {
+    return await FetchService.get<IGardenDashboard[]>({
+      url: `${API.GARDENS}/dashboard`,
+    });
+  }
+
+  static async getMetrics(gardenId: number, range: "day" | "week" | "month" | "year"): Promise<ISectorDashboard[]> {
+    return await FetchService.get<ISectorDashboard[]>({
+      url: `${API.GARDENS}/${gardenId}/metrics?range=${range}`,
+    });
+  }
+
+  static async fetchSectorsMetricDataDS(
+    id: number
+  ): Promise<IMetricReadingDTO[]> {
+    return await FetchService.get<IMetricReadingDTO[]>({
+      url: `${API.GARDENS}/${id}/sectors-metric-data`,
     });
   }
 }

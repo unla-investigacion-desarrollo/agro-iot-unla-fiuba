@@ -1,26 +1,42 @@
 export interface IMetricAcceptationRange {
   metricAcceptationRangeId: number;
   name: string;
-  startValue: number;
-  endValue: number;
+  description: string;
+  hsStartValue: number;
+  hsEndValue: number;
+  hrStartValue: number;
+  hrEndValue: number;
+  taStartValue: number;
+  taEndValue: number;
   createdAt?: string;
-  metricTypeCode: string;
   metricTypeDescription?: string;
 }
 
 export type MetricAcceptationRangeAddType = Pick<
   IMetricAcceptationRange,
-  "name" | "startValue" | "endValue" | "metricTypeCode"
+  | "name"
+  | "description"
+  | "hsStartValue"
+  | "hsEndValue"
+  | "hrStartValue"
+  | "hrEndValue"
+  | "taStartValue"
+  | "taEndValue"
 >;
 
 export type MetricAcceptationRangeUpdateType = Pick<
   IMetricAcceptationRange,
   | "metricAcceptationRangeId"
   | "name"
-  | "startValue"
-  | "endValue"
-  | "metricTypeCode"
+  | "description"
+  | "hsStartValue"
+  | "hsEndValue"
+  | "hrStartValue"
+  | "hrEndValue"
+  | "taStartValue"
+  | "taEndValue"
 >;
+
 
 export interface IMetricAcceptationRangeGarden {
   metricAcceptationRangeId: number;

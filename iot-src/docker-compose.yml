@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
 
@@ -43,7 +42,7 @@ services:
           "server.servlet.contextPath": "$SPRING_PATH",
           "CORS_CONFIG_REACT_SERVER_URL_AND_PORT":"$CORS_CONFIG_REACT_SERVER_URL_AND_PORT"}'
       volumes:
-        -             ./spring-agroecologia-iot/logs:/app/logs
+        -             ./spring-agroecologia-iot/logs:/app/logs:rw
       networks:
       -               app-fullstack-net 
       stdin_open: true

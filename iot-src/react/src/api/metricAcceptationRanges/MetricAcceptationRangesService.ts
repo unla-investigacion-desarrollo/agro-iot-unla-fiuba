@@ -35,8 +35,8 @@ class MetricAcceptationRangesService {
     });
   }
 
-  static async add(entity: MetricAcceptationRangeAddType): Promise<number> {
-    return await FetchService.post<number>({
+  static async add(entity: MetricAcceptationRangeAddType): Promise<String> {
+    return await FetchService.post<string>({
       url: API.METRIC_ACCEPTATION_RANGES,
       body: entity,
     });
@@ -45,8 +45,8 @@ class MetricAcceptationRangesService {
   static async update(
     id: string,
     entity: MetricAcceptationRangeUpdateType
-  ): Promise<void> {
-    await FetchService.put({
+  ): Promise<string> {
+    return await FetchService.put({
       url: `${API.METRIC_ACCEPTATION_RANGES}/${id}`,
       body: entity,
     });

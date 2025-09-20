@@ -3,9 +3,9 @@ export const formatMetricValueWithUnit = (
   metricTypeCode: string
 ) => {
   if (!metricTypeCode) return value;
-  if (metricTypeCode.includes("Temperatura"))
+  if (metricTypeCode.includes("Temperatura") || metricTypeCode.includes("TA"))
     return `${formatMetricValue(value, metricTypeCode)}°C`;
-  if (metricTypeCode.includes("Humedad"))
+  if (metricTypeCode.includes("Humedad")||metricTypeCode.includes("HS")||metricTypeCode.includes("HR"))
     return `${formatMetricValue(value, metricTypeCode)}%`;
   return value;
 };

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -46,17 +47,17 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(request, response);
 
-        } catch (Exception ex) {
+        } catch (AuthenticationException ex) {
+            SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(Constants.ContentTypes.APPLICATION_JSON);
-            response.getWriter().print(JsonParser.toJson(ex.getMessage()));
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"" + ex.getMessage() + "\"}");
             response.getWriter().flush();
-
-            return;
         }
     }
 
     private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) {
+        
         String authHeader = request.getHeader("Authorization");
 
         // 1. Check if format: 'Bearer token' is correct
@@ -85,7 +86,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         } else {
             return null;
         }
-
+        
     }
 
 }

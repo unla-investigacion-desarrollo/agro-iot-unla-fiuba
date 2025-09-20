@@ -1,11 +1,11 @@
-import { Button, Card, Col, Collapse, Divider, message, Row, Spin } from "antd";
-import CollapsePanel from "antd/lib/collapse/CollapsePanel";
+import { Card, Col, Empty, Divider, message, Row, Spin, Select } from "antd";
+//import CollapsePanel from "antd/lib/collapse/CollapsePanel";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useLocation } from "react-router";
 import GardensService from "../../api/gardens/GardensService";
 import { IGardenBasicInfo } from "../../api/gardens/models";
-import { ISectorMetricData } from "../../api/sectors/models";
+import { ISectorBasicData, ISectorMetricData } from "../../api/sectors/models";
 import { READING_FETCH_WAIT_TIME } from "../../config/general-config";
 import ErrorPage from "../../pages/ErrorPage";
 import BackButton from "../BackButton/BackButton";
@@ -28,23 +28,19 @@ const GardenLiveMetricData = () => {
     ISectorMetricData[]
   >([]);
 
+  const { Option } = Select;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [sectorsActiveKeys, setSectorActiveKeys] = useState<number[]>([]);
+  const [selectedSector, setSelectedSector] = useState<ISectorBasicData | undefined>(undefined);
 
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const preselectedSectorId = queryParams.get("sectorId");
 
-  const getMetricTypeCurrentReading = (
-    sectorId: number,
-    metricTypeCode: string
-  ) => {
-    let sectorData = sectorsMetricData.find((smd) => smd.sectorId === sectorId);
-    let reading =
-      sectorData &&
-      sectorData.readings.find(
-        (r) => r.isCurrentReading && r.metricTypeCode === metricTypeCode
-      );
-    return reading;
+  const getMetricCurrentReading = (sectorId: number) => {
+    const sectorData = sectorsMetricData.find((smd) => smd.sectorId === sectorId);
+    return sectorData ? sectorData.readings.find((r) => r.isCurrentReading) : undefined;
   };
 
   const getSectorCurrentReadings = (sectorId: number) => {
@@ -97,96 +93,80 @@ const GardenLiveMetricData = () => {
     return () => clearInterval(readingFetchInterval);
   }, [error, id, basicInformationFetched, gardenBasicInfo]);
 
+  useEffect(() => {
+    if (preselectedSectorId && gardenBasicInfo.sectorRangesBasicData.length > 0) {
+      const found = gardenBasicInfo.sectorRangesBasicData.find(
+        (s) => s.sectorId === Number(preselectedSectorId)
+      );
+      if (found) setSelectedSector(found);
+    }
+  }, [preselectedSectorId, gardenBasicInfo]);
+
   if (error) return <ErrorPage />;
 
   return (
-    <div className="container">
-      <Card title={<BackButton title="Huerta en vivo" />}>
-        {isLoading ? (
-          <div className="loading">
-            <Spin />
-          </div>
-        ) : (
-          <>
-            <GardenBasicInfo garden={gardenBasicInfo} />
-            <Divider>Sectores</Divider>
-            {!gardenBasicInfo.sectorRangesBasicData.length ? (
-              <span>La huerta no posee sectores</span>
-            ) : (
-              <>
-                <Button
-                  type="primary"
-                  style={{ marginBottom: 15, marginRight: 15 }}
-                  onClick={() =>
-                    setSectorActiveKeys([
-                      ...gardenBasicInfo.sectorRangesBasicData.map(
-                        (srd) => srd.sectorId
-                      ),
-                    ])
-                  }
-                >
-                  Mostrar todos
-                </Button>
-                <Button
-                  type="primary"
-                  style={{ marginBottom: 15 }}
-                  onClick={() => setSectorActiveKeys([])}
-                >
-                  Ocultar todos
-                </Button>
+  <div className="container">
+    <Card title={<BackButton title="Huerta en vivo" />}>
+      {isLoading ? (
+        <div className="loading">
+          <Spin />
+        </div>
+      ) : (
+        <>
+          <GardenBasicInfo garden={gardenBasicInfo} />
+          <Divider>Sectores</Divider>
 
-                <Collapse
-                  activeKey={sectorsActiveKeys}
-                  onChange={(activeKeys: any) =>
-                    setSectorActiveKeys(activeKeys)
-                  }
-                >
-                  {gardenBasicInfo.sectorRangesBasicData.map((sector) => (
-                    <CollapsePanel key={sector.sectorId} header={sector.name}>
-                      <Row
-                        gutter={16}
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {sector.sectorMetricRanges.map((range) => (
-                          <React.Fragment key={range.metricTypeCode}>
-                            <Col
-                              xs={24}
-                              sm={12}
-                              md={6}
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                marginBottom: 10,
-                              }}
-                            >
-                              <MetricCurrentData
-                                sectorRange={range}
-                                currentReading={getMetricTypeCurrentReading(
-                                  sector.sectorId,
-                                  range.metricTypeCode
-                                )}
-                              />
-                            </Col>
-                          </React.Fragment>
-                        ))}
-                      </Row>
-                      <Divider>Historial de lecturas</Divider>
-                      <SectorMetricsGrid
-                        readings={getSectorCurrentReadings(sector.sectorId)}
-                      />
-                    </CollapsePanel>
-                  ))}
-                </Collapse>
-              </>
-            )}
-          </>
-        )}
-      </Card>
-    </div>
-  );
+          {!gardenBasicInfo.sectorRangesBasicData.length ? (
+            <Empty description="La huerta no posee sectores" />
+          ) : (
+            <>
+              <Select
+                style={{ width: 300, marginBottom: 20 }}
+                placeholder="Seleccionar sector"
+                value={selectedSector?.sectorId}
+                onChange={(sectorId) => {
+                  const selected = gardenBasicInfo.sectorRangesBasicData.find(
+                    (s) => s.sectorId === sectorId
+                  );
+                  setSelectedSector(selected);
+                }}
+              >
+                {gardenBasicInfo.sectorRangesBasicData.map((sector) => (
+                  <Option key={sector.sectorId} value={sector.sectorId}>
+                    {sector.name}
+                  </Option>
+                ))}
+              </Select>
+
+              {selectedSector && (
+                <>
+                  <Divider>Métricas aceptadas</Divider>
+                  <Row gutter={16}>
+                    {["HS", "HR", "TA"].map((type) => (
+                      <Col xs={24} sm={12} md={8} key={type}>
+                        <MetricCurrentData
+                          sectorRange={selectedSector.metricAcceptationRange}
+                          currentReading={getMetricCurrentReading(selectedSector.sectorId)}
+                          metricType={type as "HR" | "HS" | "TA"}
+                        />
+                      </Col>
+                    ))}
+                  </Row>
+
+                  <Divider>Historial de lecturas</Divider>
+                  <SectorMetricsGrid
+                    readings={getSectorCurrentReadings(selectedSector.sectorId)}
+                  />
+                </>
+              )}
+            </>
+          )}
+        </>
+      )}
+    </Card>
+  </div>
+);
+
 };
 
 export default GardenLiveMetricData;

@@ -5,6 +5,7 @@ import RolesPage from "../pages/RolesPage";
 import { URLs } from "../config/enums";
 import LoggedInRoute from "../components/LoggedInRoute/LoggedInRoute";
 import GardensPage from "../pages/GardensPage";
+import HomePage from "../pages/HomePage";
 import DashboardPage from "../pages/DashboardPage";
 import UsersPage from "../pages/UsersPage";
 import NotFoundPage from "../pages/NotFoundPage";
@@ -20,6 +21,16 @@ const AppRoutes: React.FC = () => {
       <Routes>
         <Route
           path={`${URLs.ROOT}/*`}
+          element={
+            <AppLayout>
+              <LoggedInRoute>
+                <HomePage />
+              </LoggedInRoute>
+            </AppLayout>
+          }
+        />
+        <Route
+          path={`${URLs.DASHBOARD}/*`}
           element={
             <AppLayout>
               <LoggedInRoute>

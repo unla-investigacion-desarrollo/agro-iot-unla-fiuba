@@ -1,5 +1,7 @@
 package com.unla.agroecologiaiot.controllers;
 
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import com.unla.agroecologiaiot.shared.paginated.PagerParametersModel;
 @RestController
 @RequestMapping("api/v1/metric-acceptation-ranges")
 public class MetricAcceptationRangeController {
+
+    //private static final Logger logger = LoggerFactory.getLogger(MetricAcceptationRangeController.class);
 
     @Autowired
     @Qualifier("metricAcceptationRangeService")

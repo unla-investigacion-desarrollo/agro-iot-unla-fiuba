@@ -1,6 +1,6 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Card, message, Popconfirm, Table, Tag, Tooltip } from "antd";
-import { ColumnType } from "antd/lib/table";
+import { Button, Card, message, Popconfirm, Table, Tooltip } from "antd";
+import { ColumnsType } from "antd/lib/table";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MetricAcceptationRangesService from "../../api/metricAcceptationRanges/MetricAcceptationRangesService";
@@ -12,7 +12,6 @@ import {
   GridParams,
   ROWS_PER_PAGE,
 } from "../../helpers/grid-helper";
-import { formatMetricValueWithUnit } from "../../helpers/metric-helper";
 
 const MetricAcceptationRangesGrid: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -65,66 +64,95 @@ const MetricAcceptationRangesGrid: React.FC = () => {
     );
   };
 
-  const columns: ColumnType<IMetricAcceptationRange>[] = [
+  const columns: ColumnsType<IMetricAcceptationRange> = [
     {
       title: "Rangos de métrica",
       render: (cell: any, row: IMetricAcceptationRange) => (
         <>
           <p>
-            <b>Nombre: </b>
-            {row.name}
+            <b>Nombre: </b> {row.name}
           </p>
           <p>
-            <b>Valores: </b>
-            {formatMetricValueWithUnit(
-              row.startValue,
-              row.metricTypeCode
-            )} a {formatMetricValueWithUnit(row.endValue, row.metricTypeCode)}
+            <b>Descripción: </b> {row.description}
           </p>
           <p>
-            <b>Fecha de creación: </b>
-            {row.createdAt}
-          </p>
-          <p>
-            <b>Tipo de métrica: </b>
-            <Tag>{row.metricTypeDescription}</Tag>
+            <b>Fecha de creación: </b> {row.createdAt}
           </p>
           {renderActions(row)}
         </>
       ),
       responsive: ["xs"],
     },
-    { title: "Nombre", dataIndex: "name", responsive: ["sm"] },
+    { title: "Nombre", dataIndex: "name", align: "center", className: "text-center", responsive: ["sm"] },
+    { title: "Descripción", dataIndex: "description", align: "center", className: "text-center", width: 250, responsive: ["sm"] },
     {
-      title: "Valor inicial",
-      align: "center" as "center",
-      dataIndex: "startValue",
-      render: (cell: number, row: IMetricAcceptationRange) =>
-        formatMetricValueWithUnit(cell, row.metricTypeCode),
-      responsive: ["sm"],
+      title: "Humedad Sustrato",
+      children: [
+        {
+          title: "Min",
+          dataIndex: "hsStartValue",
+          align: "center" as const,
+          render: (cell: number) => `${cell} %`,
+          responsive: ["sm"],
+        },
+        {
+          title: "Max",
+          dataIndex: "hsEndValue",
+          align: "center" as const,
+          render: (cell: number) => `${cell} %`,
+          responsive: ["sm"],
+        },
+      ],
     },
     {
-      title: "Valor final",
-      align: "center" as "center",
-      dataIndex: "endValue",
-      render: (cell: number, row: IMetricAcceptationRange) =>
-        formatMetricValueWithUnit(cell, row.metricTypeCode),
-      responsive: ["sm"],
+      title: "Humedad Relativa",
+      children: [
+        {
+          title: "Min",
+          dataIndex: "hrStartValue",
+          align: "center" as const,
+          render: (cell: number) => `${cell} %`,
+          responsive: ["sm"],
+        },
+        {
+          title: "Max",
+          dataIndex: "hrEndValue",
+          align: "center" as const,
+          render: (cell: number) => `${cell} %`,
+          responsive: ["sm"],
+        },
+      ],
     },
-
+    {
+      title: "Temperatura Ambiente",
+      children: [
+        {
+          title: "Min",
+          dataIndex: "taStartValue",
+          align: "center" as const,
+          render: (cell: number) => `${cell} °C`,
+          responsive: ["sm"],
+        },
+        {
+          title: "Max",
+          dataIndex: "taEndValue",
+          align: "center" as const,
+          render: (cell: number) => `${cell} °C`,
+          responsive: ["sm"],
+        },
+      ],
+    },
     {
       title: "Fecha de creación",
+      align: "center",
+      className: "text-center", width: 150,
       dataIndex: "createdAt",
       responsive: ["sm"],
     },
     {
-      title: "Tipo de métrica",
-      dataIndex: "metricTypeDescription",
-      render: (cell: any) => <Tag>{cell}</Tag>,
-      responsive: ["sm"],
-    },
-    {
       title: "Acciones",
+      align: "center",
+      className: "text-center",
       render: (cell: any, row: IMetricAcceptationRange) => renderActions(row),
 
       responsive: ["sm"],

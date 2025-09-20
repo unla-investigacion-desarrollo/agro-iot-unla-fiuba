@@ -1,9 +1,11 @@
 export interface IMetricReadingDTO {
   metricReadingId: number;
   readingDate: string;
-  value: string;
+  taValue: number;
+  hrValue: number;
+  hsValue: number;
+  rainForecast: boolean;
+  irrigation: boolean;
   valueType: string;
-  metricTypeCode: string;
-  metricTypeDescription: string;
   isCurrentReading: boolean;
 }

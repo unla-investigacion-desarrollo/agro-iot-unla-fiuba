@@ -1,7 +1,11 @@
 package com.unla.agroecologiaiot.services;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 
+import com.unla.agroecologiaiot.models.GardenDTOs;
+import com.unla.agroecologiaiot.models.GardenDTOs.SectorDTO;
 import com.unla.agroecologiaiot.models.GardenModel;
 import com.unla.agroecologiaiot.models.MetricReadingModel;
 import com.unla.agroecologiaiot.shared.paginated.PagerParametersModel;
@@ -23,4 +27,9 @@ public interface IGardenService {
     public ResponseEntity<String> getSectorsMetricData(long id, boolean isAdmin, long idUser);
 
     public ResponseEntity<String> getList(PagerParametersModel pageParameters, boolean isAdmin, long idUser);
+    
+    public List<GardenDTOs.GardenDTO> getDashboard();
+
+    ResponseEntity<List<SectorDTO>> getMetrics(long gardenId, String range);
+
 }

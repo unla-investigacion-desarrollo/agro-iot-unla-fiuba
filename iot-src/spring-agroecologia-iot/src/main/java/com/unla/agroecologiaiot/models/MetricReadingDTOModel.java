@@ -11,9 +11,10 @@ public class MetricReadingDTOModel {
     
     private long metricReadingId;
     private String readingDate;
-    private String value;
-    private String valueType;
-    private String metricTypeCode;
-    private String metricTypeDescription;
+    private Double taValue;
+    private Double hrValue;
+    private Double hsValue;
+    private Boolean rainForecast;
+    private Boolean irrigation;
     private boolean isCurrentReading;
 }

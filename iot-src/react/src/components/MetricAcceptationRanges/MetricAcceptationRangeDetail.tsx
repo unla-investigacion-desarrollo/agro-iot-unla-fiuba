@@ -7,7 +7,6 @@ import {
   InputNumber,
   message,
   Popconfirm,
-  Select,
   Spin,
 } from "antd";
 import { useForm } from "antd/lib/form/Form";
@@ -19,21 +18,23 @@ import {
   MetricAcceptationRangeAddType,
   MetricAcceptationRangeUpdateType,
 } from "../../api/metricAcceptationRanges/models";
-import MetricTypesService from "../../api/metricTypes/MetricTypesService";
-import { IMetricType } from "../../api/metricTypes/models";
 import ErrorPage from "../../pages/ErrorPage";
 import BackButton from "../BackButton/BackButton";
 
 interface FormValues {
   name: string;
-  startValue: number;
-  endValue: number;
-  metricTypeCode: string;
+  description: string;
+  hsStartValue: number;
+  hsEndValue: number;
+  hrStartValue: number;
+  hrEndValue: number;
+  taStartValue: number;
+  taEndValue: number;
 }
 
 const formItemLayout = {
-  wrapperCol: { xs: 24, sm: 24, md: 24, lg: 20 },
-  labelCol: { xs: 24, sm: 24, md: 24, lg: 4 },
+  wrapperCol: { xs: 24, sm: 8, md: 6, lg: 6 },
+  labelCol: { xs: 24, sm: 16, md: 12, lg: 12 },
 };
 
 const MetricAcceptationRangeDetail: React.FC = () => {
@@ -46,53 +47,59 @@ const MetricAcceptationRangeDetail: React.FC = () => {
   const [form] = useForm<FormValues>();
   const navigate = useNavigate();
 
-  const [metricTypes, setMetricTypes] = useState<IMetricType[]>([]);
-
   const [metricAcceptationRange, setMetricAcceptationRange] =
     useState<IMetricAcceptationRange>({
       metricAcceptationRangeId: 0,
       name: "",
-      startValue: 0,
-      endValue: 0,
-      metricTypeCode: "",
+      description: "",
+      hsStartValue: 0,
+      hsEndValue: 0,
+      hrStartValue: 0,
+      hrEndValue: 0,
+      taStartValue: 0,
+      taEndValue: 0,
+      createdAt: "",
+      metricTypeDescription: "",
     });
 
   const handleSubmit = async (values: FormValues) => {
     try {
-      if (values.startValue > values.endValue)
-        return message.error(
-          "El valor inicial no puede ser mayor que el valor final"
-        );
-
       setIsSubmitting(true);
       if (id) {
         const entity: MetricAcceptationRangeUpdateType = {
           metricAcceptationRangeId: +id,
           name: values.name,
-          startValue: Number(
-            values.startValue
-            //formatMetricValue(values.startValue, values.metricTypeCode)
-          ),
-          endValue: Number(
-            values.endValue
-            //formatMetricValue(values.endValue, values.metricTypeCode)
-          ),
-          metricTypeCode: values.metricTypeCode,
+          description: values.description,
+          hsStartValue: values.hsStartValue,
+          hsEndValue: values.hsEndValue,
+          hrStartValue: values.hrStartValue,
+          hrEndValue: values.hrEndValue,
+          taStartValue: values.taStartValue,
+          taEndValue: values.taEndValue,
         };
-        await MetricAcceptationRangesService.update(id, entity);
+        const response = await MetricAcceptationRangesService.update(id, entity);
+        if (response === "Iguales") {
+          message.warning("No hay campos para modificar");
+          return;
+        }
       } else {
         const entity: MetricAcceptationRangeAddType = {
           name: values.name,
-          startValue: Number(
-            values.startValue
-          ),
-          endValue: Number(
-            values.endValue
-          ),
-          metricTypeCode: values.metricTypeCode,
+          description: values.description,
+          hsStartValue: values.hsStartValue,
+          hsEndValue: values.hsEndValue,
+          hrStartValue: values.hrStartValue,
+          hrEndValue: values.hrEndValue,
+          taStartValue: values.taStartValue,
+          taEndValue: values.taEndValue,
         };
-        await MetricAcceptationRangesService.add(entity);
+        const response = await MetricAcceptationRangesService.add(entity);
+        if (response === "Existe") {
+          message.warning("Ya existe una métrica con ese nombre y descripción");
+          return;
+        }
       }
+      
       message.success("Operación exitosa");
       navigate(-1);
     } catch (error) {
@@ -119,8 +126,6 @@ const MetricAcceptationRangeDetail: React.FC = () => {
     const fetch = async () => {
       try {
         setIsLoading(true);
-        const metricTypes = await MetricTypesService.fetchAll();
-        setMetricTypes(metricTypes);
         if (id) {
           const metricAcceptationRange =
             await MetricAcceptationRangesService.fetchOne(id);
@@ -149,7 +154,7 @@ const MetricAcceptationRangeDetail: React.FC = () => {
           <Form
             form={form}
             {...formItemLayout}
-            onFinish={(values: FormValues) => handleSubmit(values)}
+            onFinish={handleSubmit}
             initialValues={id ? metricAcceptationRange : undefined}
           >
             <Form.Item
@@ -160,39 +165,131 @@ const MetricAcceptationRangeDetail: React.FC = () => {
             >
               <Input />
             </Form.Item>
+
             <Form.Item
-              name="startValue"
-              label="Valor inicial"
+              name="description"
+              label="Descripción"
               required
               rules={[{ required: true, message: "Complete este campo" }]}
+            >
+              <Input />
+            </Form.Item>
+
+           <Form.Item
+              name="hsStartValue"
+              label="Humedad del Sustrato Valor inicial (%)"
+              rules={[
+                { required: true, message: "Complete este campo" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const end = getFieldValue("hsEndValue");
+                    if (end !== undefined && value > end) {
+                      return Promise.reject("El valor inicial debe ser menor o igual al final");
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
             >
               <InputNumber min={0} max={100} />
             </Form.Item>
+
             <Form.Item
-              name="endValue"
-              label="Valor final"
-              required
-              rules={[{ required: true, message: "Complete este campo" }]}
+              name="hsEndValue"
+              label="Humedad del Sustrato Valor final (%)"
+              dependencies={["hsStartValue"]}
+              rules={[
+                { required: true, message: "Complete este campo" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const start = getFieldValue("hsStartValue");
+                    if (start !== undefined && value < start) {
+                      return Promise.reject("El valor final debe ser mayor o igual al inicial");
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
             >
               <InputNumber min={0} max={100} />
             </Form.Item>
+
             <Form.Item
-              name="metricTypeCode"
-              label="Tipo de métrica"
-              required
-              rules={[{ required: true, message: "Complete este campo" }]}
+              name="hrStartValue"
+              label="Humedad Relativa Valor inicial (%)"
+              rules={[
+                { required: true, message: "Complete este campo" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const end = getFieldValue("hrEndValue");
+                    if (end !== undefined && value > end) {
+                      return Promise.reject("El valor inicial debe ser menor o igual al final");
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
             >
-              <Select
-                placeholder="Seleccione tipo de métrica"
-                optionFilterProp="children"
-                disabled={!!id}
-              >
-                {metricTypes.map((mt) => (
-                  <Select.Option value={mt.code}>
-                    {mt.description}
-                  </Select.Option>
-                ))}
-              </Select>
+              <InputNumber min={0} max={100} />
+            </Form.Item>
+
+            <Form.Item
+              name="hrEndValue"
+              label="Humedad Relativa Valor final (%)"
+              dependencies={["hrStartValue"]}
+              rules={[
+                { required: true, message: "Complete este campo" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const start = getFieldValue("hrStartValue");
+                    if (start !== undefined && value < start) {
+                      return Promise.reject("El valor final debe ser mayor o igual al inicial");
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
+            >
+              <InputNumber min={0} max={100} />
+            </Form.Item>
+
+            <Form.Item
+              name="taStartValue"
+              label="Temperatura Ambiente Valor inicial (°C)"
+              rules={[
+                { required: true, message: "Complete este campo" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const end = getFieldValue("taEndValue");
+                    if (end !== undefined && value > end) {
+                      return Promise.reject("El valor inicial debe ser menor o igual al final");
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
+            >
+              <InputNumber min={0} max={100} />
+            </Form.Item>
+
+            <Form.Item
+              name="taEndValue"
+              label="Temperatura Ambiente Valor final (°C)"
+              dependencies={["taStartValue"]}
+              rules={[
+                { required: true, message: "Complete este campo" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const start = getFieldValue("taStartValue");
+                    if (start !== undefined && value < start) {
+                      return Promise.reject("El valor final debe ser mayor o igual al inicial");
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
+            >
+              <InputNumber min={0} max={100} />
             </Form.Item>
             <Divider />
 

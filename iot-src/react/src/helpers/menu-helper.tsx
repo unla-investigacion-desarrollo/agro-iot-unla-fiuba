@@ -12,7 +12,7 @@ export interface MenuItem {
 
 export const MenuItems: MenuItem[] = [
   {
-    key: URLs.ROOT,
+    key: URLs.DASHBOARD,
     label: "Dashboard",
     roles: [RolesEnum.GARDEN_MANAGER, RolesEnum.VISITOR],
   },
@@ -33,10 +33,12 @@ export const MenuItems: MenuItem[] = [
         label: "Rangos de métrica",
         roles: [RolesEnum.GARDEN_MANAGER],
       },
+      /* Se elimina la pantalla de tipo de metricas
       {
         key: URLs.METRIC_TYPES,
         label: "Tipos de métrica",
       },
+      */
     ],
   },
   {
