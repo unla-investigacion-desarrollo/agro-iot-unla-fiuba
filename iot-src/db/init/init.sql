@@ -293,6 +293,7 @@ UNLOCK TABLES;
 -- DROP TABLE IF EXISTS `sector_metric_acceptation_range`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
+/*
 CREATE TABLE `sector_metric_acceptation_range` (
   `sector_id` bigint NOT NULL,
   `metric_acceptation_range_id` bigint NOT NULL,
@@ -301,6 +302,7 @@ CREATE TABLE `sector_metric_acceptation_range` (
   CONSTRAINT `FKcy5j9g92bvrlfkbsmq4fp1t8n` FOREIGN KEY (`sector_id`) REFERENCES `sector` (`sector_id`),
   CONSTRAINT `FKh989g0mxnet3wior9ieubyyet` FOREIGN KEY (`metric_acceptation_range_id`) REFERENCES `metric_acceptation_range` (`metric_acceptation_range_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+*/
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
